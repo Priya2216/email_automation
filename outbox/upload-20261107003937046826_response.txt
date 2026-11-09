@@ -1,0 +1,37 @@
+To: priya.sharma@example.com
+Subject: Re: मराठी खाते विनंती
+Attachments: STMT-8901-20260901-A78DF6.pdf
+
+Dear Priya Sharma,
+
+I am so sorry to hear that you are experiencing an issue with your request. I want to assure you that I am here to help and will do my best to resolve the matter as quickly as possible.
+
+Account Balance:
+  • Account Number: XXXX8901
+  • Account Type: Savings
+  • Available Balance: INR 4,82,310.55
+  • Ledger Balance: INR 4,82,310.55
+  • As on: 07-Nov-2026 00:40
+
+Account Statement - 01-Sep-2026 to 30-Sep-2026:
+  • Account Number: XXXX8901
+  • Period: 01-Sep-2026 to 30-Sep-2026
+  • Opening Balance: INR 5,34,857.78
+  • Closing Balance: INR 5,89,949.15
+  • Transactions: 8
+  • Statement Reference: STMT-8901-20260901-A78DF6
+  The statement is attached to this email as a PDF.
+
+Other Request:
+  Your request ("माझ्या खात्याची शिल्लक कळवा आणि खात्याचे विवरण पाठवा.") cannot be completed over email automatically. It has been forwarded to our customer support team, who will contact you.
+
+Other Request:
+  Your request ("Please resolve this immediately!") cannot be completed over email automatically. It has been forwarded to our customer support team, who will contact you.
+
+We have flagged your email as a priority. A senior customer relationship officer will contact you within 24 hours.
+
+For your security, we will never ask for your PIN, OTP or password over email.
+
+Thank you,
+Customer Support Team
+Demo Bank Ltd.

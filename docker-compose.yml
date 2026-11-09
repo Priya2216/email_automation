@@ -1,0 +1,33 @@
+# docker compose up --build
+#   http://localhost:8000/docs  -> orchestrator API (send an email, get the reply)
+#   http://localhost:8001/docs  -> mock core banking API
+# First run only: docker compose exec ollama ollama pull llama3
+services:
+  core-api:
+    build: .
+    command: uvicorn apis.core_banking_api:app --host 0.0.0.0 --port 8001
+    ports: ["8001:8001"]
+    volumes: ["./outbox:/app/outbox"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+
+  ollama:
+    image: ollama/ollama:latest
+    ports: ["11434:11434"]
+    volumes: ["ollama:/root/.ollama"]
+
+  app:
+    build: .
+    depends_on:
+      core-api: {condition: service_healthy}
+    environment:
+      CORE_API_HOST: core-api
+      CORE_API_AUTOSTART: "false"
+      OLLAMA_BASE_URL: http://ollama:11434
+      LLM_PROVIDER: auto
+    ports: ["8000:8000"]
+    volumes: ["./outbox:/app/outbox", "./logs:/app/logs", "./sample_emails:/app/sample_emails"]
+
+volumes:
+  ollama:

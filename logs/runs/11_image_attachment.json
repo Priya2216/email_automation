@@ -1,0 +1,280 @@
+{
+  "run_id": "71b89f340d1d4576b2c2405b94342f02",
+  "email_id": "11_image_attachment",
+  "sender": "rahul.verma@example.com",
+  "subject": "Statement request (scan attached)",
+  "duration_ms": 42012,
+  "llm_agents": [
+    "email_understanding_agent",
+    "entity_extraction_agent",
+    "intent_classification_agent",
+    "response_generation_agent",
+    "sentiment_analysis_agent"
+  ],
+  "sentiment": {
+    "label": "NEUTRAL",
+    "score": 0.0,
+    "is_urgent": false,
+    "escalate_to_human": false,
+    "reasons": [
+      "plain request"
+    ],
+    "method": "llm"
+  },
+  "requests": [
+    {
+      "request_id": "R1",
+      "intent": "STATEMENT_REQUEST",
+      "text_span": "Please send my account statement for the period mentioned in the attached scan.",
+      "confidence": 0.95,
+      "method": "llm",
+      "account_number": "XXXX9012",
+      "card_number": null,
+      "period_start": "2026-08-01",
+      "period_end": "2026-08-31",
+      "period_label": "01-Aug-2026 to 31-Aug-2026",
+      "transaction_count": null,
+      "entity_sources": {
+        "account_number": "attachment",
+        "period": "body"
+      },
+      "status": "SUCCESS",
+      "validation_notes": [
+        "Account validated"
+      ],
+      "result": {
+        "statement_id": "STMT-XXXX0801-221FA6",
+        "account_number": "XXXX9012",
+        "period_start": "2026-08-01",
+        "period_end": "2026-08-31",
+        "opening_balance": 1267006.49,
+        "closing_balance": 1241448.18,
+        "transaction_count": 16,
+        "currency": "INR",
+        "document_path": "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/outbox/statements/STMT-XXXX0801-221FA6.pdf"
+      },
+      "error": null
+    }
+  ],
+  "tool_calls": [
+    {
+      "step_id": "V0",
+      "tool": "get_customer_by_email",
+      "arguments": {
+        "email": "rahul.verma@example.com"
+      },
+      "ok": true,
+      "duration_ms": 28,
+      "response": {
+        "status": "FOUND",
+        "customer_id": "CUST003",
+        "name": "Rahul Verma",
+        "email": "rahul.verma@example.com",
+        "primary_account": "XXXX9012"
+      },
+      "error": null
+    },
+    {
+      "step_id": "VA1",
+      "tool": "validate_account",
+      "arguments": {
+        "account_number": "XXXX9012"
+      },
+      "ok": true,
+      "duration_ms": 19,
+      "response": {
+        "status": "VALID",
+        "customer_name": "Rahul Verma",
+        "customer_id": "CUST003",
+        "account_type": "Current"
+      },
+      "error": null
+    },
+    {
+      "step_id": "S1",
+      "tool": "get_statement",
+      "arguments": {
+        "account_number": "XXXX9012",
+        "period_start": "2026-08-01",
+        "period_end": "2026-08-31"
+      },
+      "ok": true,
+      "duration_ms": 20,
+      "response": {
+        "statement_id": "STMT-XXXX0801-221FA6",
+        "account_number": "XXXX9012",
+        "period_start": "2026-08-01",
+        "period_end": "2026-08-31",
+        "opening_balance": 1267006.49,
+        "closing_balance": 1241448.18,
+        "transaction_count": 16,
+        "currency": "INR",
+        "document_path": "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/outbox/statements/STMT-XXXX0801-221FA6.pdf"
+      },
+      "error": null
+    }
+  ],
+  "response": {
+    "to": "rahul.verma@example.com",
+    "subject": "Re: Statement request (scan attached)",
+    "body": "Dear Rahul Verma,\n\nThank you for reaching out to us. We're happy to assist you with your request to obtain your account statement for the specified period.\n\nAccount Statement - 01-Aug-2026 to 31-Aug-2026:\n  \u2022 Account Number: XXXX9012\n  \u2022 Period: 01-Aug-2026 to 31-Aug-2026\n  \u2022 Opening Balance: INR 12,67,006.49\n  \u2022 Closing Balance: INR 12,41,448.18\n  \u2022 Transactions: 16\n  \u2022 Statement Reference: STMT-XXXX0801-221FA6\n  The statement is attached to this email as a PDF.\n\nFor your security, we will never ask for your PIN, OTP or password over email.\n\nThank you,\nCustomer Support Team\nDemo Bank Ltd.",
+    "attachments": [
+      "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/outbox/statements/STMT-XXXX0801-221FA6.pdf"
+    ],
+    "in_reply_to": "<XXXX4703.21543.XXXX9820@example.com>"
+  },
+  "trace": [
+    {
+      "agent": "email_understanding_agent",
+      "event": "EMAIL_UNDERSTOOD",
+      "detail": {
+        "subject": "Statement request (scan attached)",
+        "language": "en",
+        "summary": "Request to send account statement for a specific period",
+        "attachments": [
+          {
+            "file": "scan.png",
+            "type": "image/png",
+            "method": "ocr",
+            "chars_extracted": 77
+          }
+        ]
+      },
+      "at": "2026-11-05T22:43:49"
+    },
+    {
+      "agent": "intent_classification_agent",
+      "event": "INTENTS_DETECTED",
+      "detail": {
+        "method": "llm",
+        "source": "body",
+        "multi_intent": false,
+        "intents": [
+          {
+            "id": "R1",
+            "intent": "STATEMENT_REQUEST",
+            "confidence": 0.95,
+            "span": "Please send my account statement for the period mentioned in the attached scan."
+          }
+        ]
+      },
+      "at": "2026-11-05T22:44:00"
+    },
+    {
+      "agent": "sentiment_analysis_agent",
+      "event": "SENTIMENT_DETECTED",
+      "detail": {
+        "label": "NEUTRAL",
+        "score": 0.0,
+        "is_urgent": false,
+        "escalate_to_human": false,
+        "reasons": [
+          "plain request"
+        ],
+        "method": "llm"
+      },
+      "at": "2026-11-05T22:44:02"
+    },
+    {
+      "agent": "entity_extraction_agent",
+      "event": "ENTITIES_EXTRACTED",
+      "detail": {
+        "method": "llm+rules",
+        "customer_name_in_email": "Rahul Verma",
+        "requests": [
+          {
+            "id": "R1",
+            "intent": "STATEMENT_REQUEST",
+            "account": "XXXX9012",
+            "card": null,
+            "period": "01-Aug-2026 to 31-Aug-2026",
+            "count": null,
+            "sources": {
+              "account_number": "attachment",
+              "period": "body"
+            }
+          }
+        ]
+      },
+      "at": "2026-11-05T22:44:10"
+    },
+    {
+      "agent": "validation_agent",
+      "event": "VALIDATION_DONE",
+      "detail": {
+        "sender_known": true,
+        "customer_id": "CUST003",
+        "parallel_validation_calls": 1,
+        "results": [
+          {
+            "id": "R1",
+            "status": "PENDING",
+            "notes": [
+              "Account validated"
+            ]
+          }
+        ]
+      },
+      "at": "2026-11-05T22:44:10"
+    },
+    {
+      "agent": "api_selection_agent",
+      "event": "EXECUTION_PLAN",
+      "detail": {
+        "distinct_calls": 1,
+        "parallel_waves": 1,
+        "decisions": [
+          {
+            "id": "R1",
+            "decision": "call",
+            "tool": "get_statement",
+            "step": "S1"
+          }
+        ]
+      },
+      "at": "2026-11-05T22:44:10"
+    },
+    {
+      "agent": "api_executor",
+      "event": "APIS_EXECUTED",
+      "detail": {
+        "calls": [
+          {
+            "step": "S1",
+            "tool": "get_statement",
+            "ok": true,
+            "ms": 20,
+            "error": null
+          }
+        ]
+      },
+      "at": "2026-11-05T22:44:10"
+    },
+    {
+      "agent": "response_generation_agent",
+      "event": "RESPONSE_DRAFTED",
+      "detail": {
+        "opening_by_llm": true,
+        "sections": 1,
+        "attachments": [
+          "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/outbox/statements/STMT-XXXX0801-221FA6.pdf"
+        ],
+        "outcome": "FULL_SUCCESS"
+      },
+      "at": "2026-11-05T22:44:21"
+    },
+    {
+      "agent": "email_sender",
+      "event": "RESPONSE_DELIVERED",
+      "detail": {
+        "to": "rahul.verma@example.com",
+        "mode": "file",
+        "files": {
+          "eml": "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/outbox/11_image_attachment_response.eml",
+          "txt": "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/outbox/11_image_attachment_response.txt"
+        }
+      },
+      "at": "2026-11-05T22:44:21"
+    }
+  ]
+}

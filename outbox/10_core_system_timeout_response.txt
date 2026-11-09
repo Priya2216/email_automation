@@ -1,0 +1,26 @@
+To: john.doe@example.com
+Subject: Re: Balance please
+Attachments: -
+
+Dear John Doe,
+
+Thank you for contacting us. We have processed your request. Please find the details below.
+
+Account Balance:
+  • Account Number: XXXX7890
+  • Account Type: Savings
+  • Available Balance: INR 1,25,000.00
+  • Ledger Balance: INR 1,27,450.00
+  • As on: 05-Nov-2026 22:44
+
+Account Balance Request:
+  We could not retrieve this information for account XXXX5555 right now due to a temporary system issue. Our team has been notified and will share the details with you shortly (reference C716F2CC).
+
+Account Balance Request:
+  We could not retrieve this information for account XXXX5555 right now due to a temporary system issue. Our team has been notified and will share the details with you shortly (reference C716F2CC).
+
+For your security, we will never ask for your PIN, OTP or password over email.
+
+Thank you,
+Customer Support Team
+Demo Bank Ltd.

@@ -1,0 +1,157 @@
+{
+  "_comment": "Simulated core banking data. No real customer data. Account 5555555555 simulates a core-system timeout and 6666666666 an internal error, so error handling can be demonstrated.",
+  "customers": [
+    {
+      "customer_id": "CUST001",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "primary_account": "1234567890"
+    },
+    {
+      "customer_id": "CUST002",
+      "name": "Priya Sharma",
+      "email": "priya.sharma@example.com",
+      "primary_account": "2345678901"
+    },
+    {
+      "customer_id": "CUST003",
+      "name": "Rahul Verma",
+      "email": "rahul.verma@example.com",
+      "primary_account": "3456789012"
+    }
+  ],
+  "accounts": [
+    {
+      "account_number": "1234567890",
+      "customer_id": "CUST001",
+      "account_type": "Savings",
+      "currency": "INR",
+      "available_balance": 125000.00,
+      "ledger_balance": 127450.00,
+      "status": "ACTIVE",
+      "branch": "Mumbai - Andheri East",
+      "opening_balance_2026_01_01": 98000.00
+    },
+    {
+      "account_number": "2345678901",
+      "customer_id": "CUST002",
+      "account_type": "Savings",
+      "currency": "INR",
+      "available_balance": 482310.55,
+      "ledger_balance": 482310.55,
+      "status": "ACTIVE",
+      "branch": "Pune - Baner",
+      "opening_balance_2026_01_01": 410000.00
+    },
+    {
+      "account_number": "3456789012",
+      "customer_id": "CUST003",
+      "account_type": "Current",
+      "currency": "INR",
+      "available_balance": 1520000.00,
+      "ledger_balance": 1535000.00,
+      "status": "ACTIVE",
+      "branch": "Bengaluru - Koramangala",
+      "opening_balance_2026_01_01": 1200000.00
+    },
+    {
+      "account_number": "1111222233",
+      "customer_id": "CUST001",
+      "account_type": "Savings",
+      "currency": "INR",
+      "available_balance": 0.0,
+      "ledger_balance": 0.0,
+      "status": "CLOSED",
+      "branch": "Mumbai - Andheri East",
+      "opening_balance_2026_01_01": 0.0
+    },
+    {
+      "account_number": "5555555555",
+      "customer_id": "CUST001",
+      "account_type": "Savings",
+      "currency": "INR",
+      "available_balance": 1000.00,
+      "ledger_balance": 1000.00,
+      "status": "ACTIVE",
+      "branch": "Mumbai - Andheri East",
+      "opening_balance_2026_01_01": 1000.00,
+      "_simulate": "timeout"
+    },
+    {
+      "account_number": "6666666666",
+      "customer_id": "CUST001",
+      "account_type": "Savings",
+      "currency": "INR",
+      "available_balance": 1000.00,
+      "ledger_balance": 1000.00,
+      "status": "ACTIVE",
+      "branch": "Mumbai - Andheri East",
+      "opening_balance_2026_01_01": 1000.00,
+      "_simulate": "error"
+    }
+  ],
+  "cards": [
+    {
+      "card_number": "4567123456788901",
+      "card_reference": "456712345",
+      "customer_id": "CUST001",
+      "card_type": "Credit",
+      "network": "VISA",
+      "status": "ACTIVE",
+      "credit_limit": 200000.00,
+      "available_limit": 151240.00,
+      "transactions": [
+        {"date": "2026-10-28", "description": "Amazon India", "category": "Shopping", "amount": 4599.00, "type": "DEBIT"},
+        {"date": "2026-10-26", "description": "Swiggy", "category": "Food", "amount": 642.50, "type": "DEBIT"},
+        {"date": "2026-10-24", "description": "Indian Oil Petrol Pump", "category": "Fuel", "amount": 3000.00, "type": "DEBIT"},
+        {"date": "2026-10-21", "description": "Payment received - Thank you", "category": "Payment", "amount": 25000.00, "type": "CREDIT"},
+        {"date": "2026-10-19", "description": "BookMyShow", "category": "Entertainment", "amount": 1150.00, "type": "DEBIT"},
+        {"date": "2026-10-15", "description": "Reliance Digital", "category": "Electronics", "amount": 18999.00, "type": "DEBIT"},
+        {"date": "2026-10-11", "description": "MakeMyTrip", "category": "Travel", "amount": 12450.00, "type": "DEBIT"},
+        {"date": "2026-10-07", "description": "Big Bazaar", "category": "Groceries", "amount": 2310.75, "type": "DEBIT"}
+      ]
+    },
+    {
+      "card_number": "5243987654321098",
+      "card_reference": "987654321",
+      "customer_id": "CUST001",
+      "card_type": "Credit",
+      "network": "Mastercard",
+      "status": "ACTIVE",
+      "credit_limit": 100000.00,
+      "available_limit": 86400.00,
+      "transactions": [
+        {"date": "2026-10-30", "description": "Uber India", "category": "Travel", "amount": 386.00, "type": "DEBIT"},
+        {"date": "2026-10-27", "description": "Zomato", "category": "Food", "amount": 899.00, "type": "DEBIT"},
+        {"date": "2026-10-22", "description": "Croma", "category": "Electronics", "amount": 7499.00, "type": "DEBIT"},
+        {"date": "2026-10-18", "description": "Netflix Subscription", "category": "Entertainment", "amount": 649.00, "type": "DEBIT"},
+        {"date": "2026-10-12", "description": "Decathlon", "category": "Shopping", "amount": 4167.00, "type": "DEBIT"}
+      ]
+    },
+    {
+      "card_number": "4111222233334444",
+      "card_reference": "411122223",
+      "customer_id": "CUST002",
+      "card_type": "Credit",
+      "network": "VISA",
+      "status": "ACTIVE",
+      "credit_limit": 300000.00,
+      "available_limit": 287650.00,
+      "transactions": [
+        {"date": "2026-10-29", "description": "Tanishq", "category": "Jewellery", "amount": 9850.00, "type": "DEBIT"},
+        {"date": "2026-10-20", "description": "Myntra", "category": "Shopping", "amount": 2500.00, "type": "DEBIT"}
+      ]
+    },
+    {
+      "card_number": "4000123412341234",
+      "card_reference": "400012341",
+      "customer_id": "CUST001",
+      "card_type": "Credit",
+      "network": "VISA",
+      "status": "BLOCKED",
+      "credit_limit": 50000.00,
+      "available_limit": 0.0,
+      "transactions": []
+    }
+  ]
+}

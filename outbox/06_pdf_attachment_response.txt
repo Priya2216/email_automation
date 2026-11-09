@@ -1,0 +1,29 @@
+To: priya.sharma@example.com
+Subject: Re: Request form attached
+Attachments: STMT-8901-20260901-1B045E.pdf
+
+Dear Priya Sharma,
+
+Thank you for reaching out to us. We're happy to assist you with your request, and we'll review the attached document to ensure a prompt and accurate processing.
+
+Account Balance:
+  • Account Number: XXXX8901
+  • Account Type: Savings
+  • Available Balance: INR 4,82,310.55
+  • Ledger Balance: INR 4,82,310.55
+  • As on: 05-Nov-2026 22:43
+
+Account Statement - September 2026:
+  • Account Number: XXXX8901
+  • Period: 01-Sep-2026 to 30-Sep-2026
+  • Opening Balance: INR 5,34,857.78
+  • Closing Balance: INR 5,89,949.15
+  • Transactions: 8
+  • Statement Reference: STMT-8901-20260901-1B045E
+  The statement is attached to this email as a PDF.
+
+For your security, we will never ask for your PIN, OTP or password over email.
+
+Thank you,
+Customer Support Team
+Demo Bank Ltd.

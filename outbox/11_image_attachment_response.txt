@@ -1,0 +1,22 @@
+To: rahul.verma@example.com
+Subject: Re: Statement request (scan attached)
+Attachments: STMT-9012-20260801-221FA6.pdf
+
+Dear Rahul Verma,
+
+Thank you for reaching out to us. We're happy to assist you with your request to obtain your account statement for the specified period.
+
+Account Statement - 01-Aug-2026 to 31-Aug-2026:
+  • Account Number: XXXX9012
+  • Period: 01-Aug-2026 to 31-Aug-2026
+  • Opening Balance: INR 12,67,006.49
+  • Closing Balance: INR 12,41,448.18
+  • Transactions: 16
+  • Statement Reference: STMT-9012-20260801-221FA6
+  The statement is attached to this email as a PDF.
+
+For your security, we will never ask for your PIN, OTP or password over email.
+
+Thank you,
+Customer Support Team
+Demo Bank Ltd.

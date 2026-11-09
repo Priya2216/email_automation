@@ -1,0 +1,33 @@
+# Core
+pydantic>=2.7
+pydantic-settings>=2.3
+python-dotenv>=1.0
+httpx>=0.27
+tenacity>=8.2
+lingua-language-detector>=2.1.1
+
+# APIs (mock core banking + orchestrator)
+fastapi>=0.111
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+
+# MCP (Model Context Protocol) server + client
+mcp>=2.0
+
+# Agentic orchestration + LLM (Llama 3 via Ollama, through LangChain)
+langgraph>=1.0
+langchain-core>=1.0
+langchain-ollama>=1.0
+
+# Persistence (audit trail) - SQLite by default, PostgreSQL via DATABASE_URL
+sqlalchemy>=2.0
+
+# Attachments: PDF text, PDF generation, images + OCR
+pypdf>=5.0
+fpdf2>=2.7
+pillow>=10.0
+pytesseract>=0.3.10   # needs the Tesseract binary for OCR (optional)
+
+# Tests
+pytest>=8.0
+pytest-asyncio>=0.23

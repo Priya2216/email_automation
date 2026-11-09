@@ -1,0 +1,32 @@
+From: customer.support@demobank.example
+To: john.doe@example.com
+Subject: Re: Balance and card details
+Message-ID: <179389881909.69023.856623608320095575@demobank.example>
+In-Reply-To: <179379164701.21543.2689617414751814164@example.com>
+References: <179379164701.21543.2689617414751814164@example.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+Dear John Doe,
+
+Thank you for reaching out to us. We're happy to assist you with your request=
+ for account balance and card transactions. We'll be happy to provide you wit=
+h the necessary information to help you manage your account.
+
+Account Balance:
+  =E2=80=A2 Account Number: XXXX7890
+  =E2=80=A2 Account Type: Savings
+  =E2=80=A2 Available Balance: INR 1,25,000.00
+  =E2=80=A2 Ledger Balance: INR 1,27,450.00
+  =E2=80=A2 As on: 05-Nov-2026 22:43
+
+Credit Card Request:
+  The credit card number provided (XXXX XXXX XXXX 9999) could not be validate=
+d. Kindly recheck the card details and resend your request.
+
+For your security, we will never ask for your PIN, OTP or password over email.
+
+Thank you,
+Customer Support Team
+Demo Bank Ltd.

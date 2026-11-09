@@ -1,0 +1,15 @@
+From: John Doe <john.doe@example.com>
+To: customer.support@demobank.example
+Subject: Balance enquiry
+Date: Tue, 03 Nov 2026 09:00:00 +0530
+Message-ID: <179379164699.21543.8741329032022462463@example.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+Dear Team,
+
+Please provide my savings account balance for account number 1234567890.
+
+Regards,
+John Doe

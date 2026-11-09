@@ -1,0 +1,23 @@
+To: priya.sharma@example.com
+Subject: Re: Cheque book and balance
+Attachments: -
+
+Dear Priya Sharma,
+
+Thank you for reaching out to us. We're happy to assist you with your request for a new cheque book and provide you with an update on your account balance.
+
+Account Balance:
+  • Account Number: XXXX8901
+  • Account Type: Savings
+  • Available Balance: INR 4,82,310.55
+  • Ledger Balance: INR 4,82,310.55
+  • As on: 05-Nov-2026 22:44
+
+Account Statement Request:
+  To process this request we need your statement period (month/year or date range). Kindly reply to this email with the details.
+
+For your security, we will never ask for your PIN, OTP or password over email.
+
+Thank you,
+Customer Support Team
+Demo Bank Ltd.

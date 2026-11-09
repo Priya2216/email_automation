@@ -1,0 +1,28 @@
+From: customer.support@demobank.example
+To: rahul.verma@example.com
+Subject: Re: Need details
+Message-ID: <179389883867.69023.7325494425176577418@demobank.example>
+In-Reply-To: <179379164702.21543.16238831941688097814@example.com>
+References: <179379164702.21543.16238831941688097814@example.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+Dear Rahul Verma,
+
+Thank you for reaching out to us. We're happy to assist you with your request=
+ to receive credit card transactions and account statements.
+
+Credit Card Transactions Request:
+  To process this request we need your credit card number. Kindly reply to th=
+is email with the details.
+
+Account Statement Request:
+  To process this request we need your statement period (month/year or date r=
+ange). Kindly reply to this email with the details.
+
+For your security, we will never ask for your PIN, OTP or password over email.
+
+Thank you,
+Customer Support Team
+Demo Bank Ltd.
