@@ -1,0 +1,8 @@
+[HELD FOR HUMAN REVIEW #4] reasons: ESCALATION: ไม่ได้ข้าด้วย, ข้าไม่ได้ลืมสมาตายอีก; LOW_CONFIDENCE: 0.55 < threshold 0.65; UNSUPPORTED_REQUEST: R1
+To: +919820000001
+Subject: Re: Voice call
+
+Hi Customer,
+Other Request: Your request ("ไม่ได้ข้าด้วย ข้าไม่ได้ลืมสมาตายอีก") cannot be completed over email automatically. It has been forwarded to our customer support team, who will contact you.
+Your request is flagged as priority; an officer will contact you within 24 hours.
+Never share your PIN or OTP with anyone.

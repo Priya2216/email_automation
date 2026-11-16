@@ -1,0 +1,200 @@
+{
+  "run_id": "34c69b04b96d4332b074b6251f9f1175",
+  "email_id": "voice-XXXX8877",
+  "channel": "voice",
+  "sender": "+XXXX0001",
+  "escalate_to_human": true,
+  "overall_confidence": 0.55,
+  "confidence": {
+    "overall": 0.55,
+    "requests": [
+      {
+        "id": "R1",
+        "intent": "UNSUPPORTED",
+        "status": "UNSUPPORTED",
+        "intent_confidence": 0.5,
+        "entity_confidence": 0.7,
+        "execution_confidence": 0.5,
+        "confidence": 0.55
+      }
+    ],
+    "penalties": [],
+    "threshold": 0.65,
+    "ocr_confidence": null
+  },
+  "review": {
+    "hold": true,
+    "kind": "APPROVAL",
+    "reasons": [
+      "ESCALATION: \u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e02\u0e49\u0e32\u0e14\u0e49\u0e27\u0e22, \u0e02\u0e49\u0e32\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e25\u0e37\u0e21\u0e2a\u0e21\u0e32\u0e15\u0e32\u0e22\u0e2d\u0e35\u0e01",
+      "LOW_CONFIDENCE: 0.55 < threshold 0.65",
+      "UNSUPPORTED_REQUEST: R1"
+    ],
+    "status": "PENDING",
+    "review_id": 4
+  },
+  "subject": "Voice call",
+  "duration_ms": 11063,
+  "llm_agents": [
+    "email_understanding_agent",
+    "sentiment_analysis_agent"
+  ],
+  "sentiment": {
+    "label": "NEGATIVE",
+    "score": -0.5,
+    "is_urgent": false,
+    "escalate_to_human": true,
+    "reasons": [
+      "\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e02\u0e49\u0e32\u0e14\u0e49\u0e27\u0e22",
+      "\u0e02\u0e49\u0e32\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e25\u0e37\u0e21\u0e2a\u0e21\u0e32\u0e15\u0e32\u0e22\u0e2d\u0e35\u0e01"
+    ],
+    "method": "llm"
+  },
+  "requests": [
+    {
+      "request_id": "R1",
+      "intent": "UNSUPPORTED",
+      "text_span": "\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e02\u0e49\u0e32\u0e14\u0e49\u0e27\u0e22 \u0e02\u0e49\u0e32\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e25\u0e37\u0e21\u0e2a\u0e21\u0e32\u0e15\u0e32\u0e22\u0e2d\u0e35\u0e01",
+      "confidence": 0.5,
+      "method": "rules",
+      "account_number": null,
+      "card_number": null,
+      "period_start": null,
+      "period_end": null,
+      "period_label": null,
+      "transaction_count": null,
+      "entity_sources": {},
+      "status": "UNSUPPORTED",
+      "validation_notes": [],
+      "result": {},
+      "error": null
+    }
+  ],
+  "tool_calls": [],
+  "response": {
+    "to": "+XXXX0001",
+    "subject": "Re: Voice call",
+    "body": "Hi Customer,\nOther Request: Your request (\"\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e02\u0e49\u0e32\u0e14\u0e49\u0e27\u0e22 \u0e02\u0e49\u0e32\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e25\u0e37\u0e21\u0e2a\u0e21\u0e32\u0e15\u0e32\u0e22\u0e2d\u0e35\u0e01\") cannot be completed over email automatically. It has been forwarded to our customer support team, who will contact you.\nYour request is flagged as priority; an officer will contact you within 24 hours.\nNever share your PIN or OTP with anyone.",
+    "attachments": [],
+    "in_reply_to": ""
+  },
+  "trace": [
+    {
+      "agent": "email_understanding_agent",
+      "event": "EMAIL_UNDERSTOOD",
+      "detail": {
+        "subject": "Voice call",
+        "language": "en",
+        "summary": "The customer is unable to remember their login credentials and is seeking assistance to reset them.",
+        "attachments": []
+      },
+      "at": "2026-11-16T13:24:37"
+    },
+    {
+      "agent": "intent_classification_agent",
+      "event": "INTENTS_DETECTED",
+      "detail": {
+        "method": "rules",
+        "source": "body",
+        "multi_intent": false,
+        "intents": [
+          {
+            "id": "R1",
+            "intent": "UNSUPPORTED",
+            "confidence": 0.5,
+            "span": "\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e02\u0e49\u0e32\u0e14\u0e49\u0e27\u0e22 \u0e02\u0e49\u0e32\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e25\u0e37\u0e21\u0e2a\u0e21\u0e32\u0e15\u0e32\u0e22\u0e2d\u0e35\u0e01"
+          }
+        ]
+      },
+      "at": "2026-11-16T13:24:39"
+    },
+    {
+      "agent": "sentiment_analysis_agent",
+      "event": "SENTIMENT_DETECTED",
+      "detail": {
+        "label": "NEGATIVE",
+        "score": -0.5,
+        "is_urgent": false,
+        "escalate_to_human": true,
+        "reasons": [
+          "\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e02\u0e49\u0e32\u0e14\u0e49\u0e27\u0e22",
+          "\u0e02\u0e49\u0e32\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e25\u0e37\u0e21\u0e2a\u0e21\u0e32\u0e15\u0e32\u0e22\u0e2d\u0e35\u0e01"
+        ],
+        "method": "llm"
+      },
+      "at": "2026-11-16T13:24:43"
+    },
+    {
+      "agent": "entity_extraction_agent",
+      "event": "ENTITIES_EXTRACTED",
+      "detail": {
+        "method": "rules",
+        "customer_name_in_email": null,
+        "requests": [
+          {
+            "id": "R1",
+            "intent": "UNSUPPORTED",
+            "account": null,
+            "card": null,
+            "period": null,
+            "count": null,
+            "sources": {}
+          }
+        ]
+      },
+      "at": "2026-11-16T13:24:43"
+    },
+    {
+      "agent": "response_generation_agent",
+      "event": "RESPONSE_DRAFTED",
+      "detail": {
+        "opening_by_llm": false,
+        "policy_answer_by_llm": false,
+        "sections": 2,
+        "attachments": [],
+        "language": "en",
+        "channel": "voice",
+        "policy_sources": [],
+        "outcome": "NO_DATA_RETURNED"
+      },
+      "at": "2026-11-16T13:24:43"
+    },
+    {
+      "agent": "confidence_scoring_agent",
+      "event": "CONFIDENCE_SCORED",
+      "detail": {
+        "overall": 0.55,
+        "requests": [
+          {
+            "id": "R1",
+            "intent": "UNSUPPORTED",
+            "status": "UNSUPPORTED",
+            "intent_confidence": 0.5,
+            "entity_confidence": 0.7,
+            "execution_confidence": 0.5,
+            "confidence": 0.55
+          }
+        ],
+        "penalties": [],
+        "threshold": 0.65,
+        "ocr_confidence": null
+      },
+      "at": "2026-11-16T13:24:43"
+    },
+    {
+      "agent": "human_review_gate",
+      "event": "REVIEW_DECISION",
+      "detail": {
+        "decision": "HELD_FOR_APPROVAL",
+        "reasons": [
+          "ESCALATION: \u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e02\u0e49\u0e32\u0e14\u0e49\u0e27\u0e22, \u0e02\u0e49\u0e32\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e25\u0e37\u0e21\u0e2a\u0e21\u0e32\u0e15\u0e32\u0e22\u0e2d\u0e35\u0e01",
+          "LOW_CONFIDENCE: 0.55 < threshold 0.65",
+          "UNSUPPORTED_REQUEST: R1"
+        ],
+        "review_id": 4,
+        "overall_confidence": 0.55
+      },
+      "at": "2026-11-16T13:24:43"
+    }
+  ]
+}
