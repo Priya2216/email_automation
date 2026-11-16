@@ -12,7 +12,7 @@ import asyncio
 from itertools import groupby
 
 from agents.audit_agent import audit
-from models.schemas import RequestStatus, ToolCallRecord
+from models.schemas import IntentType, RequestStatus, ToolCallRecord
 from utils.mcp_client import BankingMCPClient
 from workflows.state import WorkflowState
 
@@ -46,6 +46,9 @@ class APIExecutor:
             if rec.ok:
                 req.status = RequestStatus.SUCCESS
                 req.result = rec.response
+                if req.intent == IntentType.POLICY_QUERY and not rec.response.get("hits"):
+                    req.status = RequestStatus.UNSUPPORTED  # nothing relevant in the knowledge base -> a human
+                    req.validation_notes.append("No relevant policy found")
             else:
                 code = (rec.error or "").split(":")[0]
                 req.status = RequestStatus.INVALID if code in ("INVALID_ACCOUNT", "INVALID_CARD") else RequestStatus.API_ERROR

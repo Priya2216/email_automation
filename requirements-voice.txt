@@ -1,0 +1,2 @@
+# Optional: speech-to-text for the voice channel (POST /v1/process-voice with an audio file)
+faster-whisper>=1.0

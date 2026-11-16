@@ -149,7 +149,3 @@ Use from any MCP client, e.g. Claude Desktop `claude_desktop_config.json`:
   "output_files": { "eml": "outbox/…_response.eml", "txt": "outbox/…_response.txt", "audit_json": "logs/runs/….json" }
 }
 ```
-
-`language` is detected by Lingua from the cleaned email body and is returned as an ISO 639-1 code when
-available (for example, `mr` for Marathi); otherwise it is `unknown`. Extracted PDF/image attachment text is
-available to other workflow steps, but is not included in this language-detection input.

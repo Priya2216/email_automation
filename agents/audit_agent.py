@@ -37,10 +37,20 @@ class AuditAgent:
 
         email = state["email"]
         duration_ms = int((time.time() - state["started_at"]) * 1000)
+        statuses = [r.status.value for r in state.get("requests", [])]
+        outcome = ("FULL_SUCCESS" if statuses and all(x == "SUCCESS" for x in statuses) else
+                   "PARTIAL_SUCCESS" if "SUCCESS" in statuses else "NO_DATA_RETURNED")
+        review = state.get("review", {})
+        confidence = state.get("confidence", {})
         summary = {
             "run_id": state["run_id"],
             "email_id": email.email_id,
+            "channel": email.channel,
             "sender": email.sender,
+            "escalate_to_human": state["sentiment"].escalate_to_human,
+            "overall_confidence": confidence.get("overall"),
+            "confidence": confidence,
+            "review": review,
             "subject": email.subject,
             "duration_ms": duration_ms,
             "llm_agents": sorted(set(state.get("llm_agents", []))),
@@ -52,6 +62,14 @@ class AuditAgent:
         }
         path = runs_dir / f"{email.email_id}.json"
         path.write_text(json.dumps(mask_value(summary), indent=2, default=str), encoding="utf-8")
+        audit_db.record_run_summary(
+            run_id=state["run_id"], email_id=email.email_id, channel=email.channel,
+            language=state.get("reply_language", "en"), sender=email.sender, duration_ms=duration_ms,
+            outcome=outcome, sentiment=state["sentiment"].label.value, escalated=state["sentiment"].escalate_to_human,
+            overall_confidence=confidence.get("overall", 0.0), review_status=review.get("status", "NOT_REQUIRED"),
+            llm_used=bool(state.get("llm_agents")), intents=[r.intent.value for r in state.get("requests", [])],
+            statuses=statuses,
+            tool_calls=[{"tool": c.tool, "ok": c.ok, "ms": c.duration_ms} for c in state.get("tool_calls", [])])
 
         entry = audit(state, self.name, "RUN_COMPLETED",
                       {"duration_ms": duration_ms, "requests": len(summary["requests"]),

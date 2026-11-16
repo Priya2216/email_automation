@@ -5,19 +5,22 @@
       "customer_id": "CUST001",
       "name": "John Doe",
       "email": "john.doe@example.com",
-      "primary_account": "1234567890"
+      "primary_account": "1234567890",
+      "phone": "+919820000001"
     },
     {
       "customer_id": "CUST002",
       "name": "Priya Sharma",
       "email": "priya.sharma@example.com",
-      "primary_account": "2345678901"
+      "primary_account": "2345678901",
+      "phone": "+919820000002"
     },
     {
       "customer_id": "CUST003",
       "name": "Rahul Verma",
       "email": "rahul.verma@example.com",
-      "primary_account": "3456789012"
+      "primary_account": "3456789012",
+      "phone": "+919820000003"
     }
   ],
   "accounts": [

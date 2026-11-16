@@ -4,7 +4,7 @@
 
 | # | Agent | Responsibility (task §7) | LLM use | Fallback |
 |---|---|---|---|---|
-| 1 | Email Understanding Agent | Detect the cleaned email body's language with Lingua; summarise the email and read downloaded attachments | 1-line summary | first sentence |
+| 1 | Email Understanding Agent | Read and summarise the email; read downloaded attachments | 1-line summary | first sentence |
 | 2 | Intent Classification Agent | Identify every customer request (multi-intent) | split + classify | clause rules |
 | 3 | Sentiment Analysis Agent | Neutral / Positive / Negative / Urgent + escalation | label + reasons | lexicon |
 | 4 | Entity Extraction Agent | Account, card, date range, count, name | per-request JSON | regex + context |
@@ -24,7 +24,7 @@ through the shared, typed `WorkflowState`.
 
 | Step | Agent | Decision (from the audit trail) |
 |---|---|---|
-| 1 | Email Understanding | Lingua detects language `en` from the cleaned email body; summary "Please provide balance for account XXXX7890 and card transactions for card XXXX9999." |
+| 1 | Email Understanding | language `en`; summary "Please provide balance for account XXXX7890 and card transactions for card XXXX9999." |
 | 2a | Intent Classification | clause split on "and" → `R1 BALANCE_ENQUIRY` (0.9), `R2 CARD_TRANSACTIONS` (0.9); `multi_intent: true` |
 | 2b | Sentiment (parallel) | `NEUTRAL`, score 0.0, no escalation |
 | 3 | Entity Extraction | R1 → account `1234567890` (source body); R2 → card `999999999` (source body), count 5 (default) |

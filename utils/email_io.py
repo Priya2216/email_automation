@@ -27,7 +27,7 @@ from pathlib import Path
 
 from config.settings import get_settings
 from models.schemas import Attachment, IncomingEmail, ResponseEmail
-from utils.attachments import extract_text
+from utils.attachments import extract_text_with_confidence
 
 log = logging.getLogger(__name__)
 
@@ -62,10 +62,11 @@ def parse_email_bytes(raw: bytes, email_id: str) -> IncomingEmail:
         att_dir.mkdir(parents=True, exist_ok=True)
         saved = att_dir / filename
         saved.write_bytes(payload)  # "Download the attached document"
-        text, method = extract_text(saved, part.get_content_type())
+        text, method, ocr_conf = extract_text_with_confidence(saved, part.get_content_type())
         attachments.append(Attachment(filename=filename, content_type=part.get_content_type(),
                                       saved_path=str(saved), size_bytes=len(payload),
-                                      extracted_text=text, extraction_method=method))
+                                      extracted_text=text, extraction_method=method,
+                                      ocr_confidence=ocr_conf))
     try:
         received = parsedate_to_datetime(msg["Date"]) if msg["Date"] else datetime.now()
     except (TypeError, ValueError):
@@ -113,9 +114,18 @@ def build_message(response: ResponseEmail) -> EmailMessage:
     return msg
 
 
-def deliver(response: ResponseEmail, email_id: str) -> dict[str, str]:
-    """Write the reply to outbox/ (always) and send it via SMTP when configured."""
+def deliver(response: ResponseEmail, email_id: str, channel: str = "email") -> dict[str, str]:
+    """Email: write the reply to outbox/ (always) and send it via SMTP when configured.
+    Other channels (chat / SMS / WhatsApp / voice): write the text reply to outbox/<channel>/ (the channel
+    gateway - Twilio, WhatsApp Business, a voice bot - picks it up from there or from the API response)."""
     s = get_settings()
+    if channel != "email":
+        folder = s.outbox_dir / channel
+        folder.mkdir(parents=True, exist_ok=True)
+        txt_path = folder / f"{_safe_name(email_id)}_response.txt"
+        txt_path.write_text(f"To: {response.to}\n\n{response.body}\n", encoding="utf-8")
+        return {"txt": str(txt_path)}
+
     s.outbox_dir.mkdir(parents=True, exist_ok=True)
     msg = build_message(response)
     eml_path = s.outbox_dir / f"{_safe_name(email_id)}_response.eml"
@@ -132,4 +142,19 @@ def deliver(response: ResponseEmail, email_id: str) -> dict[str, str]:
             smtp.login(s.smtp_user, s.smtp_password)
             smtp.send_message(msg)
         files["smtp"] = f"sent to {response.to}"
+    return files
+
+
+def deliver_reply(response: ResponseEmail, email_id: str, channel: str = "email", customer_email: str = "",
+                  name: str = "Customer", language: str = "en") -> dict[str, str]:
+    """Deliver a reply on its channel. A PDF (statement) cannot travel by SMS / chat / voice, so for those
+    channels it is emailed to the customer's registered address."""
+    from utils.i18n import t
+
+    files = deliver(response, email_id, channel)
+    if channel != "email" and response.attachments and customer_email:
+        mail = ResponseEmail(to=customer_email, subject=t(language, "stmt_mail_subject"),
+                             body=t(language, "stmt_mail_body", name=name), attachments=response.attachments)
+        for key, value in deliver(mail, f"{email_id}_statement", "email").items():
+            files[f"statement_mail_{key}"] = value
     return files

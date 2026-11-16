@@ -4,7 +4,6 @@ pydantic-settings>=2.3
 python-dotenv>=1.0
 httpx>=0.27
 tenacity>=8.2
-lingua-language-detector>=2.1.1
 
 # APIs (mock core banking + orchestrator)
 fastapi>=0.111
@@ -22,11 +21,15 @@ langchain-ollama>=1.0
 # Persistence (audit trail) - SQLite by default, PostgreSQL via DATABASE_URL
 sqlalchemy>=2.0
 
-# Attachments: PDF text, PDF generation, images + OCR
+# PostgreSQL driver (used when DATABASE_URL=postgresql+psycopg://...)
+psycopg[binary]>=3.1
+
+# Attachments: PDF text, PDF generation, images + OCR (Tesseract + poppler are system packages)
 pypdf>=5.0
 fpdf2>=2.7
 pillow>=10.0
 pytesseract>=0.3.10   # needs the Tesseract binary for OCR (optional)
+pdf2image>=1.17       # scanned-PDF OCR; needs poppler (pdftoppm). PyMuPDF also works as a fallback
 
 # Tests
 pytest>=8.0

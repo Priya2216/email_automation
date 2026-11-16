@@ -12,6 +12,7 @@ class IntentType(str, Enum):
     BALANCE_ENQUIRY = "BALANCE_ENQUIRY"
     CARD_TRANSACTIONS = "CARD_TRANSACTIONS"
     STATEMENT_REQUEST = "STATEMENT_REQUEST"
+    POLICY_QUERY = "POLICY_QUERY"      # "what are the late payment charges?" -> RAG over bank policies
     UNSUPPORTED = "UNSUPPORTED"
 
 
@@ -40,7 +41,8 @@ class Attachment(BaseModel):
     saved_path: str
     size_bytes: int
     extracted_text: str = ""
-    extraction_method: str = ""  # pdf-text | ocr | plain-text | unsupported
+    extraction_method: str = ""  # pdf-text | pdf-ocr | ocr | plain-text | unsupported
+    ocr_confidence: Optional[float] = None  # mean word confidence 0..100 (OCR only)
 
 
 class IncomingEmail(BaseModel):
@@ -52,6 +54,7 @@ class IncomingEmail(BaseModel):
     body: str
     received_at: datetime = Field(default_factory=datetime.now)
     attachments: list[Attachment] = []
+    channel: str = "email"  # email | chat | sms | whatsapp | voice
 
 
 # --------------------------------------------------------------------------- #
@@ -62,6 +65,7 @@ class EmailUnderstanding(BaseModel):
     summary: str
     language: str = "en"
     attachment_text: str = ""
+    ocr_confidence: Optional[float] = None  # lowest OCR confidence among the attachments
 
 
 class SentimentResult(BaseModel):
@@ -134,3 +138,14 @@ class ProcessingResult(BaseModel):
     llm_used: bool
     duration_ms: int
     output_files: dict[str, str] = {}
+    # --- channel / language -------------------------------------------------------
+    channel: str = "email"
+    reply_language: str = "en"
+    reply_text: str = ""  # the reply formatted for the channel (plain text; spoken style for voice)
+    # --- confidence scoring + human-in-the-loop -----------------------------------
+    overall_confidence: float = 0.0
+    confidence_breakdown: dict[str, Any] = {}
+    needs_human_review: bool = False
+    review_reasons: list[str] = []
+    review_status: str = "NOT_REQUIRED"  # NOT_REQUIRED | PENDING | APPROVED | REJECTED
+    review_id: Optional[int] = None

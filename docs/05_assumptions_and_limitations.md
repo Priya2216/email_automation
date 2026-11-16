@@ -21,10 +21,17 @@
 |---|---|---|
 | LLM | Llama 3 needs Ollama (≈ 4.7 GB model, best with ≥ 16 GB RAM). Without it the rule engine is used — accurate for the defined intents and phrasings, but less flexible for unusual wording. | Run Ollama on a GPU server; fine-tune a small model (SLM) on labelled bank emails. |
 | OCR | Image attachments need the Tesseract binary (`brew install tesseract`). Without it, image text is skipped (logged) and the email is still processed. Scanned PDFs (no text layer) are not OCR-ed. | Add `pdf2image` + Tesseract, or a vision LLM (e.g. Llama 3.2 Vision). |
-| Language | Lingua detects the cleaned email body's language and returns an ISO 639-1 code when available (for example, `mr` for Marathi); extracted attachment text is not part of language detection. A detected language does not mean every downstream component understands that language: the rule-based intent and sentiment logic is English-centric. | Include attachment text in language detection if needed; add multilingual intent/entity/sentiment handling or translation before processing. |
+| Language | Detection supports en / hi / mr heuristically; intents/entities are English-only. | Translate non-English mails with the LLM before processing. |
 | Intents | Only balance, card transactions, statements; others are forwarded as UNSUPPORTED. | See docs/04 §4.4 to add intents. |
 | Security | The orchestrator REST API returns unmasked numbers in `requests[]` (internal use only) and has no authentication. | Add OAuth2/API keys; mask in the API response; run inside the bank network. |
 | Statement delivery | The PDF is attached in clear. | Password-protect the PDF (e.g. DOB-based) or send a secure download link. |
 | Scale | Single process; the in-memory concurrency limit is per instance. | Queue (Kafka/SQS/RabbitMQ) + multiple workers; PostgreSQL for audit; Redis for idempotency. |
 | Idempotency | Re-processing the same `.eml` sends a second reply. | Track processed `Message-ID`s in the database. |
 | MCP transport | stdio (server is a local subprocess). | Use MCP Streamable HTTP to run the server as a separate service. |
+
+
+## Added later (see 06_advanced_features.md)
+OCR for scans, Hindi/Marathi, human approval queue, RAG policy lookup, omnichannel, confidence scoring and a
+monitoring dashboard were added. Their own "not covered" lists are in that document. Common to all of them:
+nothing was run against a live Llama 3 / Ollama embedding model / Whisper model in the development sandbox - those
+code paths are covered by fakes in the tests and must be smoke-tested on a machine with Ollama.

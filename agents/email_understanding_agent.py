@@ -26,6 +26,9 @@ class EmailUnderstandingAgent:
             f"[Attachment: {a.filename}]\n{a.extracted_text}" for a in email.attachments if a.extracted_text
         )
 
+        ocr_confs = [a.ocr_confidence for a in email.attachments if a.ocr_confidence is not None and a.extracted_text]
+        ocr_confidence = min(ocr_confs) if ocr_confs else None
+
         llm_agents = []
         reply = await ask_json("email_understanding", email_text=clean[:4000])
         if isinstance(reply, dict) and reply.get("summary"):
@@ -38,10 +41,11 @@ class EmailUnderstandingAgent:
             summary = mask_text(first[:200])
 
         understanding = EmailUnderstanding(clean_text=clean, summary=summary, language=language,
-                                           attachment_text=attachment_text)
+                                           attachment_text=attachment_text, ocr_confidence=ocr_confidence)
         entry = audit(state, self.name, "EMAIL_UNDERSTOOD", {
             "subject": email.subject, "language": language, "summary": summary,
             "attachments": [{"file": a.filename, "type": a.content_type, "method": a.extraction_method,
-                             "chars_extracted": len(a.extracted_text)} for a in email.attachments],
+                             "chars_extracted": len(a.extracted_text), "ocr_confidence": a.ocr_confidence}
+                            for a in email.attachments],
         })
         return {"understanding": understanding, "trace": [entry], "llm_agents": llm_agents}

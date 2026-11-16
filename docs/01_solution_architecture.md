@@ -42,7 +42,7 @@ flowchart LR
 |---|---|---|
 | Input | Email Reader | `imaplib` (IMAP over SSL) or `.eml` folder, `email` stdlib parser |
 | Attachments | Downloader + extractor | `pypdf` (PDF text), `pytesseract` + Pillow (OCR for any image format) |
-| Intelligence | 8 agents | Python, Lingua language detection, Llama 3 (Ollama) via LangChain, rule-based NLP fallback |
+| Intelligence | 8 agents | Python, Llama 3 (Ollama) via LangChain, rule-based NLP fallback |
 | Orchestration | Agent Orchestrator | **LangGraph** state machine with parallel branches |
 | Integration | MCP server/client | **Model Context Protocol** Python SDK (`mcp`) |
 | Core systems | Mock core banking API | **FastAPI** + Uvicorn |
@@ -79,7 +79,7 @@ sequenceDiagram
     participant AU as Audit
 
     M->>O: new email (+ attachments downloaded)
-    O->>EU: clean body, Lingua language code, summary, attachment text
+    O->>EU: clean text, language, summary, attachment text
     par in parallel
         O->>IC: detect all requests (multi-intent)
     and
@@ -106,7 +106,7 @@ sequenceDiagram
 | **Security** | Account/card numbers masked (last 4 digits) in replies, logs, audit DB and summaries (`utils/masking.py` + logging filter); ownership check — data is only returned if the account/card belongs to the sender's registered profile; the LLM never produces facts; no secrets in code (`.env`). |
 | **Auditability** | Every agent decision and every MCP tool call is stored in `audit_log` (run id, agent, event, masked payload, timestamp) + one JSON execution record per email in `logs/runs/`. |
 | **Extensibility** | New intent = keyword rule + prompt line + one entry in `INTENT_TO_TOOL` + one MCP tool. Agents are independent classes; the graph is declared in one file. |
-| **Accuracy** | Hybrid NLP: Llama 3 when available, deterministic rules otherwise; LLM output is schema-validated and **numbers are verified to exist in the source text** (anti-hallucination); confidence score per request; 23 automated tests. |
+| **Accuracy** | Hybrid NLP: Llama 3 when available, deterministic rules otherwise; LLM output is schema-validated and **numbers are verified to exist in the source text** (anti-hallucination); confidence score per request (utils/confidence.py); 71 automated tests. |
 | **Performance** | Rule path processes an email in ~0.3–2 s (incl. API calls); per-call timeouts (5 s) and bounded retries keep the SLA predictable; one slow API never blocks the others. |
 
 ## 1.6 Deployment views

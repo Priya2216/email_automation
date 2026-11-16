@@ -30,7 +30,12 @@ def _statement_args(r: CustomerRequest) -> dict:
             "period_end": r.period_end.isoformat()}
 
 
+def _policy_args(r: CustomerRequest) -> dict:
+    return {"query": r.text_span, "top_k": 3}
+
+
 INTENT_TO_TOOL = {
+    IntentType.POLICY_QUERY: ("search_policy", _policy_args),
     IntentType.BALANCE_ENQUIRY: ("get_account_balance", _balance_args),
     IntentType.CARD_TRANSACTIONS: ("get_card_transactions", _card_args),
     IntentType.STATEMENT_REQUEST: ("get_statement", _statement_args),

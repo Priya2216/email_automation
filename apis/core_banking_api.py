@@ -55,6 +55,10 @@ class CustomerEmailRequest(BaseModel):
     email: str = Field(..., examples=["john.doe@example.com"])
 
 
+class CustomerPhoneRequest(BaseModel):
+    phone: str = Field(..., examples=["+919820000001"])
+
+
 # --------------------------------------------------------------------------- #
 # Chaos + demo simulation
 # --------------------------------------------------------------------------- #
@@ -123,3 +127,9 @@ async def get_statement(req: StatementRequest):
 @app.post("/api/v1/GetCustomerByEmailAPI", tags=["Customers"])
 def get_customer_by_email(req: CustomerEmailRequest):
     return svc.get_customer_by_email(req.email)
+
+
+@app.post("/api/v1/GetCustomerByPhoneAPI", tags=["Customers"])
+def get_customer_by_phone(req: CustomerPhoneRequest):
+    """Used by the chat / SMS / WhatsApp / voice channels to identify the customer."""
+    return svc.get_customer_by_phone(req.phone)

@@ -68,6 +68,15 @@ def get_customer_by_email(email: str) -> dict:
     return {"status": "NOT_FOUND", "email": email}
 
 
+def get_customer_by_phone(phone: str) -> dict:
+    """Identify a customer of the chat / SMS / WhatsApp / voice channels by mobile number (last 10 digits)."""
+    wanted = _digits(phone)[-10:]
+    for cust in _CUSTOMERS.values():
+        if wanted and _digits(cust.get("phone", ""))[-10:] == wanted:
+            return {"status": "FOUND", **cust}
+    return {"status": "NOT_FOUND", "phone": phone}
+
+
 # --------------------------------------------------------------------------- #
 # Accounts
 # --------------------------------------------------------------------------- #

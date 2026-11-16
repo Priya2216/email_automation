@@ -23,11 +23,18 @@ Agent Orchestrator - the agentic workflow, built with LangGraph.
                 │ api_execution   │  (MCP, parallel)│
                 └────────┬────────┘                 │
                 ┌────────▼────────┐◄────────────────┘
-                │ response_gen    │
+                │ response_gen    │  (language + channel aware, RAG answers)
                 └────────┬────────┘
                 ┌────────▼────────┐
-                │ deliver         │  (outbox / SMTP)
+                │ confidence      │  (score the reply)
                 └────────┬────────┘
+                ┌────────▼────────┐
+                │ human_review    │──── hold ──────────────┐  (reply waits for a person)
+                └────────┬────────┘                        │
+                ┌────────▼────────┐                        │
+                │ deliver         │  (outbox / SMTP)       │
+                └────────┬────────┘                        │
+                ┌────────▼────────┐◄───────────────────────┘
                 ┌────────▼────────┐
                 │ audit           │
                 └─────────────────┘
@@ -44,15 +51,18 @@ from langgraph.graph import END, START, StateGraph
 from agents.api_executor import APIExecutor
 from agents.api_selection_agent import APISelectionAgent
 from agents.audit_agent import AuditAgent, audit
+from agents.confidence_agent import ConfidenceScoringAgent
 from agents.email_understanding_agent import EmailUnderstandingAgent
 from agents.entity_agent import EntityExtractionAgent
+from agents.human_review_agent import HumanReviewGateAgent
 from agents.intent_agent import IntentClassificationAgent
 from agents.response_agent import ResponseGenerationAgent
 from agents.sentiment_agent import SentimentAnalysisAgent
 from agents.validation_agent import ValidationAgent
 from config.settings import get_settings
 from models.schemas import IncomingEmail, ProcessingResult, RequestStatus
-from utils.email_io import deliver
+from utils.channels import format_reply
+from utils.email_io import deliver_reply
 from utils.llm import llm_enabled
 from utils.mcp_client import BankingMCPClient
 from workflows.state import WorkflowState
@@ -69,13 +79,23 @@ def build_workflow(mcp: BankingMCPClient):
     selection = APISelectionAgent()
     executor = APIExecutor(mcp)
     responder = ResponseGenerationAgent()
+    confidence = ConfidenceScoringAgent()
+    review_gate = HumanReviewGateAgent()
     auditor = AuditAgent()
 
     async def deliver_node(state: WorkflowState) -> dict:
-        files = deliver(state["response"], state["email"].email_id)
+        email, profile = state["email"], state.get("customer_profile") or {}
+        files = deliver_reply(state["response"], email.email_id, email.channel,
+                              customer_email=profile.get("email", ""), name=profile.get("name") or "Customer",
+                              language=state.get("reply_language", "en"))
+        files = {**state.get("output_files", {}), **files}
         entry = audit(state, "email_sender", "RESPONSE_DELIVERED",
-                      {"to": state["response"].to, "mode": get_settings().send_mode, "files": files})
+                      {"to": state["response"].to, "channel": email.channel, "mode": get_settings().send_mode,
+                       "files": files})
         return {"output_files": files, "trace": [entry]}
+
+    def route_after_review(state: WorkflowState) -> str:
+        return "audit" if state["review"]["hold"] else "deliver"
 
     def route_after_entities(state: WorkflowState) -> str:
         actionable = any(r.status == RequestStatus.PENDING for r in state["requests"])
@@ -90,6 +110,8 @@ def build_workflow(mcp: BankingMCPClient):
     g.add_node("api_selection", selection.run)
     g.add_node("api_execution", executor.run)
     g.add_node("response_generation", responder.run)
+    g.add_node("confidence_scoring", confidence.run)
+    g.add_node("human_review_gate", review_gate.run)
     g.add_node("deliver", deliver_node)
     g.add_node("audit", auditor.run)
 
@@ -102,7 +124,9 @@ def build_workflow(mcp: BankingMCPClient):
     g.add_edge("validation", "api_selection")
     g.add_edge("api_selection", "api_execution")
     g.add_edge("api_execution", "response_generation")
-    g.add_edge("response_generation", "deliver")
+    g.add_edge("response_generation", "confidence_scoring")
+    g.add_edge("confidence_scoring", "human_review_gate")
+    g.add_conditional_edges("human_review_gate", route_after_review, {"deliver": "deliver", "audit": "audit"})
     g.add_edge("deliver", "audit")
     g.add_edge("audit", END)
     return g.compile()
@@ -121,6 +145,11 @@ async def process_email(email: IncomingEmail, mcp: BankingMCPClient, graph=None)
         escalate_to_human=state["sentiment"].escalate_to_human,
         llm_used=bool(state.get("llm_agents")) and llm_enabled(),
         duration_ms=int((time.time() - started) * 1000), output_files=state.get("output_files", {}),
+        channel=email.channel, reply_language=state.get("reply_language", "en"),
+        reply_text=format_reply(email.channel, state["response"].body),
+        overall_confidence=state["confidence"]["overall"], confidence_breakdown=state["confidence"],
+        needs_human_review=state["review"]["hold"], review_reasons=state["review"]["reasons"],
+        review_status=state["review"]["status"], review_id=state["review"]["review_id"],
     )
 
 

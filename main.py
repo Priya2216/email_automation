@@ -8,6 +8,7 @@ Usage:
                    --sender john.doe@example.com
     python main.py --source imap           # read UNSEEN mails from a real mailbox (.env)
     python main.py --show-response         # also print every generated reply
+    python main.py --channel whatsapp --sender +919820000001 --text "माझ्या खात्याची शिल्लक सांगा"
 """
 from __future__ import annotations
 
@@ -32,7 +33,7 @@ STATUS_ICON = {RequestStatus.SUCCESS: "OK ", RequestStatus.INVALID: "INV", Reque
 def load_emails(args) -> list[IncomingEmail]:
     if args.text:
         return [IncomingEmail(email_id=f"adhoc-{datetime.now():%Y%m%d%H%M%S}", sender=args.sender,
-                              subject=args.subject, body=args.text)]
+                              subject=args.subject, body=args.text, channel=args.channel)]
     if args.email:
         path = Path(args.email)
         return [parse_email_bytes(path.read_bytes(), path.stem)]
@@ -43,14 +44,21 @@ def load_emails(args) -> list[IncomingEmail]:
 
 def print_result(r: ProcessingResult, show_response: bool) -> None:
     flag = "  !! ESCALATED TO HUMAN" if r.escalate_to_human else ""
+    if r.needs_human_review:
+        flag += f"  >> HELD FOR HUMAN APPROVAL (review #{r.review_id})"
+    elif r.review_status == "HANDOFF_OPEN":
+        flag += f"  >> HAND-OFF TO SUPPORT (review #{r.review_id})"
     print(f"\n=== {r.email_id}  ({r.duration_ms} ms){flag}")
     print(f"    sentiment : {r.sentiment.label.value} (score {r.sentiment.score}, via {r.sentiment.method})"
-          f"   language: {r.language}")
+          f"   language: {r.language} -> reply in {r.reply_language}   channel: {r.channel}")
+    print(f"    confidence: {r.overall_confidence} (threshold {get_settings().confidence_threshold})"
+          + (f"   reasons: {'; '.join(r.review_reasons)}" if r.review_reasons else ""))
     for req in r.requests:
         detail = req.error or "; ".join(req.validation_notes[-1:]) or ""
         print(f"    [{STATUS_ICON[req.status]}] {req.request_id:<5} {req.intent.value:<18} "
               f"{req.status.value:<12} {detail}")
-    print(f"    MCP calls : {len(r.tool_calls)}   reply -> {r.output_files.get('txt', '')}")
+    where = r.output_files.get("txt") or r.output_files.get("pending_review_draft", "")
+    print(f"    MCP calls : {len(r.tool_calls)}   reply -> {where}")
     if show_response:
         print("    " + "-" * 70)
         print("\n".join("    " + line for line in r.response.body.splitlines()))
@@ -62,6 +70,8 @@ def main() -> int:
     parser.add_argument("--text", help="process an ad-hoc email body")
     parser.add_argument("--sender", default="john.doe@example.com", help="sender for --text")
     parser.add_argument("--subject", default="Customer enquiry", help="subject for --text")
+    parser.add_argument("--channel", default="email", choices=["email", "chat", "sms", "whatsapp", "voice"],
+                        help="channel for --text (chat/sms/whatsapp/voice use a mobile number as --sender)")
     parser.add_argument("--source", choices=["folder", "imap"], default=None)
     parser.add_argument("--show-response", action="store_true", help="print the generated replies")
     args = parser.parse_args()

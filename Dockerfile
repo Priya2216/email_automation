@@ -2,8 +2,9 @@
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
-# tesseract-ocr enables OCR of image attachments inside the container
-RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr curl \
+# tesseract (+ Hindi / Marathi packs) = OCR of images and scanned PDFs; poppler-utils renders PDF pages
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-hin \
+    tesseract-ocr-mar poppler-utils curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

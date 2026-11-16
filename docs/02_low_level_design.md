@@ -35,7 +35,7 @@ intelligent-email-automation-mcp/
 │   ├── audit_db.py                SQLAlchemy audit table
 │   ├── logger.py                  logging framework
 │   ├── core_api_runner.py         auto-start of the mock core API
-│   └── text_utils.py              cleaning, Lingua language detection, INR formatting
+│   └── text_utils.py              cleaning, language detection, INR formatting
 ├── config/settings.py, config/.env.example
 ├── tests/                         unit + end-to-end + LLM-path tests (pytest)
 ├── sample_emails/inbox/*.eml      12 sample test emails (incl. PDF & image attachments)
@@ -69,9 +69,6 @@ classDiagram
     class SentimentResult {
       label, score, is_urgent, escalate_to_human, reasons
     }
-    class EmailUnderstanding {
-      clean_text, summary, language, attachment_text
-    }
     class PlannedCall { step_id, request_id, tool, arguments, wave }
     class ToolCallRecord { step_id, tool, arguments, ok, duration_ms, response, error }
     class ResponseEmail { to, subject, body, attachments, in_reply_to }
@@ -98,7 +95,7 @@ stateDiagram-v2
 
 | Agent | Reads | Logic | Writes |
 |---|---|---|---|
-| Email Understanding | `email` | strip quoted replies & signatures; detect the cleaned email body's language with Lingua (ISO 639-1 code when available, otherwise `unknown`); concatenate extracted attachment text; produce a masked 1-line summary | `understanding` |
+| Email Understanding | `email` | strip quoted replies & signatures, detect language, concatenate attachment text, 1-line summary (LLM or first sentence, masked) | `understanding` |
 | Intent Classification | `understanding` | LLM splits into requests (validated: allowed intent, span must exist) **or** rules: sentence → clause split on *and/also/;*, keyword classification, orphan clauses merged as context, repeated intents merged; if the body has no request, the attachment text is classified | `requests[]` |
 | Sentiment Analysis | `understanding` | LLM label **or** lexicon (negative, escalation, urgency, positive) with score; escalation flag never removed by the LLM | `sentiment` |
 | Entity Extraction | `requests`, `understanding` | numbers classified by pattern + nearest keyword (*account*/*card*); masked cards `4567XXXX8901`; counts (`last 5`, `three`); periods (month names, ranges, DD/MM/YYYY, *last month*, *last N months*); look-up order clause → body (if unambiguous) → attachment; one request per number; LLM numbers verified against source text | `requests[]` (enriched), `customer_profile.name_in_email` |

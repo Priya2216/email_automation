@@ -17,6 +17,9 @@ class WorkflowState(TypedDict, total=False):
     plan: list[PlannedCall]
     response: ResponseEmail
     output_files: dict[str, str]
+    reply_language: str
+    confidence: dict[str, Any]
+    review: dict[str, Any]
     # list fields are appended to by several (possibly parallel) agents
     tool_calls: Annotated[list[ToolCallRecord], operator.add]
     trace: Annotated[list[dict], operator.add]

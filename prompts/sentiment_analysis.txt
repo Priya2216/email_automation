@@ -6,6 +6,8 @@ Classify the customer's sentiment:
 - NEGATIVE : angry, frustrated, disappointed, threatening to escalate/complain
 - URGENT   : time-critical request (urgent, immediately, today, emergency) - can also be negative
 
+The email may be written in English, Hindi or Marathi (Devanagari script) or a mix; understand all of them.
+
 Return:
 - label: one of POSITIVE, NEUTRAL, NEGATIVE, URGENT
 - score: -1.0 (very negative) to 1.0 (very positive)

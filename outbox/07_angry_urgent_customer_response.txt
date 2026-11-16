@@ -4,7 +4,7 @@ Attachments: -
 
 Dear John Doe,
 
-I am so sorry to hear that you're experiencing an issue with your credit card. I understand the urgency and concern you have regarding the recent transactions, and I'm here to help you investigate this matter further.
+I'm so sorry to hear that you're experiencing an issue with an unauthorized charge on your credit card. I'm here to help you resolve this matter as quickly as possible.
 
 Credit Card Transactions - Card XXXX XXXX XXXX 8901 (VISA Credit), last 3:
   1. 28-Oct-2026  Amazon India                       INR 4,599.00 Dr

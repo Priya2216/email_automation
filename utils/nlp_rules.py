@@ -30,24 +30,80 @@ _UNSUPPORTED_TOPIC = re.compile(
     r"fixed deposit|\bfd\b|interest rate|close my account|nominee|mobile number|net ?banking password|"
     r"debit card replacement|new card|insurance|locker)\b", re.I)
 
-_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+|\n+")
-_CLAUSE_SPLIT = re.compile(r"\s*(?:,\s*)?\b(?:and also|and|also|as well as|plus|along with)\b\s*|\s*;\s*", re.I)
+# --- Hindi / Marathi (Devanagari). Python's \b does not work next to Devanagari vowel signs, so these
+#     are plain substring patterns; the words are distinctive enough to avoid false hits.
+_BALANCE_DEV = re.compile(r"बॅलन्स|बॅलेन्स|बैलेंस|बैलन्स|शिल्लक|शेष राशि|बकाया राशि|खात्यात किती|खात्यातील रक्कम|"
+                          r"खाते में कितने|कितना पैसा|कितने पैसे|किती पैसे")
+_STATEMENT_DEV = re.compile(r"स्टेटमेंट|स्टेटमेन्ट|खाते उतारा|खातेउतारा|उतारा|पासबुक|खाते का विवरण")
+_TXN_DEV = re.compile(r"व्यवहार|ट्रान्झॅक्शन|ट्रान्झेक्शन|ट्रांजैक्शन|ट्रांजेक्शन|लेनदेन|लेन-देन|खर्च|खरेदी")
+_CARD_DEV = re.compile(r"कार्ड")
+_ACCOUNT_DEV = re.compile(r"खाते|खाता|खात्या|अकाउंट|बचत")
+_REQUEST_VERB_DEV = re.compile(r"कृपया|पाठवा|पाठवावे|पाठवावी|सांगा|द्या|द्यावे|द्यावी|हवे|हवी|भेजें|भेजिए|भेज दें|"
+                               r"बताएं|बताइए|चाहिए|दीजिए|करा|करें")
+_UNSUPPORTED_DEV = re.compile(r"कर्ज|लोन|चेकबुक|चेक बुक|पत्ता बदल|पता बदल|केवायसी|विमा|बीमा|एफडी|ठेव")
+
+# --- Policy / information questions ("what are the late payment charges?") -> RAG, not a data API
+_QUESTION = re.compile(
+    r"\?|^\s*(?:what|how|when|why|which|where|is|are|can|could|does|do|will|would)\b|"
+    r"\b(?:tell me|explain|information (?:about|on)|details (?:of|about)|want to know|wanted to know|know about)\b",
+    re.I)
+_POLICY_TOPIC = re.compile(
+    r"\b(charges?|fees?|penalt(?:y|ies)|policy|policies|procedure|process|terms|conditions|eligib\w+|"
+    r"documents? required|minimum (?:average )?balance|average (?:monthly )?balance|maintenance|"
+    r"interest rates?|rate of interest|late payment|annual fee|joining fee|cash advance|forex|chargeback|"
+    r"dispute|lost|stolen|zero liability|grievance|ombudsman|timeline|turnaround|how long|how many days|"
+    r"working days|cut-?off|block(?:ing)?|re-?issue|replacement|kyc|nominee|cheque ?book)\b", re.I)
+_QUESTION_DEV = re.compile(r"\?|कसे|कैसे|काय|क्या|किती|कितना|कितने|केव्हा|कब |माहिती|जानकारी")
+_POLICY_TOPIC_DEV = re.compile(
+    r"शुल्क|चार्ज|दंड|पॉलिसी|धोरण|नियम|प्रक्रिया|पात्रता|कागदपत्र|दस्तऐवज|दस्तावेज|किमान शिल्लक|मिनिमम|न्यूनतम|"
+    r"व्याज|ब्याज|हरवले|हरवला|हरवल|खो गया|खो गई|चोरी|ब्लॉक|विवाद|तक्रार निवारण|शिकायत निवारण|किती दिवस|कितने दिन|"
+    r"चेकबुक|चेक बुक")
+
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?।])\s+|\n+")
+_CLAUSE_SPLIT = re.compile(r"\s*(?:,\s*)?\b(?:and also|and|also|as well as|plus|along with)\b\s*|\s*;\s*|"
+                           r"\s+(?:आणि|तसेच|और|तथा)\s+", re.I)
+
+
+def _any(clause: str, *patterns) -> bool:
+    return any(p.search(clause) for p in patterns)
+
+
+def is_policy_question(clause: str) -> bool:
+    return (_any(clause, _QUESTION, _QUESTION_DEV)) and _any(clause, _POLICY_TOPIC, _POLICY_TOPIC_DEV)
+
+
+def classify_clause_scored(clause: str, ctx_card: bool = False, ctx_account: bool = False
+                           ) -> Optional[tuple[IntentType, float]]:
+    """(intent, confidence) of one clause. Confidence reflects how unambiguous the evidence is:
+    a keyword AND an identifier (account/card number, period) = high; a guess from context = low."""
+    numbers = find_numbers(clause, default_kind="card")
+    has_card_number = bool(numbers) and _any(clause, _CARD, _CARD_DEV)
+    has_card_word = _any(clause, _CARD, _CARD_DEV)
+
+    if is_policy_question(clause):
+        return IntentType.POLICY_QUERY, 0.85
+    if _any(clause, _STATEMENT, _STATEMENT_DEV):
+        return IntentType.STATEMENT_REQUEST, 0.96 if extract_period(clause) else 0.92
+    if _any(clause, _TXN, _TXN_DEV) and (has_card_word or has_card_number):
+        return IntentType.CARD_TRANSACTIONS, 0.96 if numbers else 0.92
+    if _any(clause, _BALANCE, _BALANCE_DEV):
+        return IntentType.BALANCE_ENQUIRY, 0.95 if numbers else 0.9
+    if _any(clause, _TXN, _TXN_DEV):
+        # a transactions request with no card word in THIS clause: use the rest of the email as context
+        if ctx_card and not ctx_account:
+            return IntentType.CARD_TRANSACTIONS, 0.8
+        # "account transactions for April" == a statement
+        if ctx_account or re.search(r"\baccount\b", clause, re.I) or _ACCOUNT_DEV.search(clause):
+            return IntentType.STATEMENT_REQUEST, 0.82
+        return IntentType.STATEMENT_REQUEST, 0.55  # genuinely ambiguous -> low confidence -> human review
+    if _any(clause, _UNSUPPORTED_TOPIC, _UNSUPPORTED_DEV) and _any(clause, _REQUEST_VERB, _REQUEST_VERB_DEV):
+        return IntentType.UNSUPPORTED, 0.7
+    return None
 
 
 def classify_clause(clause: str) -> Optional[IntentType]:
-    has_card_number = bool(find_numbers(clause, default_kind="card")) and _CARD.search(clause)
-    if _STATEMENT.search(clause):
-        return IntentType.STATEMENT_REQUEST
-    if _TXN.search(clause) and (_CARD.search(clause) or has_card_number):
-        return IntentType.CARD_TRANSACTIONS
-    if _BALANCE.search(clause):
-        return IntentType.BALANCE_ENQUIRY
-    if _TXN.search(clause):
-        # "account transactions for April" == a statement
-        return IntentType.STATEMENT_REQUEST
-    if _UNSUPPORTED_TOPIC.search(clause) and _REQUEST_VERB.search(clause):
-        return IntentType.UNSUPPORTED
-    return None
+    scored = classify_clause_scored(clause)
+    return scored[0] if scored else None
 
 
 @dataclass
@@ -59,6 +115,9 @@ class DetectedIntent:
 
 def detect_intents(text: str) -> list[DetectedIntent]:
     """Split the email into clauses, classify each, merge context clauses."""
+    ctx_card = _any(text, _CARD, _CARD_DEV) or bool(numbers_of_kind(text, "card"))
+    ctx_account = _any(text, re.compile(r"\b(?:account|a/c|acct)\b", re.I), _ACCOUNT_DEV) or \
+        bool(numbers_of_kind(text, "account"))
     clauses: list[str] = []
     for sentence in _SENTENCE_SPLIT.split(text):
         sentence = sentence.strip()
@@ -68,23 +127,23 @@ def detect_intents(text: str) -> list[DetectedIntent]:
     detected: list[DetectedIntent] = []
     pending_context = ""
     for clause in clauses:
-        intent = classify_clause(clause)
-        if intent is None:
+        scored = classify_clause_scored(clause, ctx_card, ctx_account)
+        if scored is None:
             # no intent keyword: it is context (e.g. "and 2345678901", "February 2026")
             if detected and _carries_entities(clause):
                 detected[-1].text_span += f" and {clause}"
             elif _carries_entities(clause):
                 pending_context += f" {clause}"
             continue
+        intent, confidence = scored
         span = f"{pending_context.strip()} {clause}".strip() if pending_context else clause
         pending_context = ""
         # an intent mentioned again without new account/card numbers (e.g. "Statement period:
         # September 2026" after "account statement") refines the earlier request
         earlier = next((d for d in reversed(detected) if d.intent == intent), None)
-        if earlier and not find_numbers(clause):
+        if earlier and intent != IntentType.POLICY_QUERY and not find_numbers(clause):
             earlier.text_span += f" and {span}"
             continue
-        confidence = 0.75 if intent == IntentType.UNSUPPORTED else 0.9
         detected.append(DetectedIntent(intent, span, confidence))
     return detected
 
@@ -120,9 +179,9 @@ def find_numbers(text: str, default_kind: str | None = None) -> list[FoundNumber
         if any(s <= m.start() < e for s, e in taken):
             continue
         before = text[max(0, m.start() - 40): m.start()].lower()
-        card_pos = max(before.rfind("card"), -1)
-        acc_match = list(_ACCOUNT_WORD.finditer(before))
-        acc_pos = acc_match[-1].start() if acc_match else -1
+        card_pos = max(before.rfind("card"), before.rfind("कार्ड"), -1)
+        acc_match = list(_ACCOUNT_WORD.finditer(before)) + list(_ACCOUNT_DEV.finditer(before))
+        acc_pos = max(m.start() for m in acc_match) if acc_match else -1
         if card_pos > acc_pos:
             kind = "card"
         elif acc_pos > card_pos:
@@ -163,7 +222,17 @@ _COUNT_RES = [
 ]
 
 
+_COUNT_DEV = [
+    re.compile(r"(?:शेवटचे|शेवटच्या|शेवटचा|अंतिम|पिछले|आखिरी|ताजे|ताज्या|मागील|गेल्या)\s*(\d{1,2})"),
+    re.compile(r"(\d{1,2})\s*(?:व्यवहार|ट्रान्झॅक्शन|ट्रान्झेक्शन|ट्रांजैक्शन|लेनदेन|लेन-देन)"),
+]
+
+
 def extract_count(text: str) -> Optional[int]:
+    for regex in _COUNT_DEV:
+        m = regex.search(text)
+        if m:
+            return int(m.group(1))
     for regex in _COUNT_RES:
         m = regex.search(text)
         if m:
@@ -184,6 +253,17 @@ _DMY_DATE = re.compile(r"\b(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})\b")
 _DAY_MONTH_YEAR = re.compile(r"\b(\d{1,2})(?:st|nd|rd|th)?\s+(" + "|".join(sorted(_MONTHS, key=len, reverse=True))
                              + r")\.?,?\s+(\d{4})\b", re.I)
 _MONTH_NUM_YEAR = re.compile(r"\b(\d{1,2})/(\d{4})\b")
+
+
+_DEV_MONTHS = {
+    "जानेवारी": 1, "जनवरी": 1, "फेब्रुवारी": 2, "फरवरी": 2, "मार्च": 3, "एप्रिल": 4, "अप्रैल": 4, "अप्रेल": 4,
+    "मई": 5, "जून": 6, "जुलै": 7, "जुलाई": 7, "ऑगस्ट": 8, "अगस्त": 8, "सप्टेंबर": 9, "सितंबर": 9, "सितम्बर": 9,
+    "ऑक्टोबर": 10, "अक्टूबर": 10, "नोव्हेंबर": 11, "नवंबर": 11, "नवम्बर": 11, "डिसेंबर": 12, "दिसंबर": 12,
+    "दिसम्बर": 12,
+}
+_DEV_MONTH_RE = re.compile("(" + "|".join(sorted(_DEV_MONTHS, key=len, reverse=True)) + r")(?:[ ,'-]*(\d{4}))?")
+_MAY_DEV_RE = re.compile(r"मे[ ,'-]+(\d{4})")  # Marathi "May" (bare "मे" is too common without a year)
+_LAST_MONTH_DEV = re.compile(r"(?:मागील|गेल्या|मागच्या|पिछले|पिछला|पिछली)\s*(?:महिन्या|महिने|महीने|महीना|महिना)")
 
 
 def _month_end(year: int, month: int) -> date:
@@ -221,7 +301,7 @@ def extract_period(text: str, today: date | None = None) -> Optional[tuple[date,
         return ds[0], ds[-1], f"{ds[0]:%d-%b-%Y} to {ds[-1]:%d-%b-%Y}"
 
     # relative periods
-    if re.search(r"\b(last|previous|past)\s+month\b", lower):
+    if re.search(r"\b(last|previous|past)\s+month\b", lower) or _LAST_MONTH_DEV.search(text):
         start = _shift_months(today.replace(day=1), -1)
         return start, _month_end(start.year, start.month), f"{start:%B %Y}"
     if re.search(r"\b(this|current)\s+month\b", lower):
@@ -248,6 +328,10 @@ def extract_period(text: str, today: date | None = None) -> Optional[tuple[date,
     for mm in _MONTH_NUM_YEAR.finditer(text):
         if 1 <= int(mm[1]) <= 12:
             months.append((int(mm[1]), int(mm[2])))
+    for mm in _DEV_MONTH_RE.finditer(text):
+        months.append((_DEV_MONTHS[mm.group(1)], int(mm.group(2)) if mm.group(2) else None))
+    for mm in _MAY_DEV_RE.finditer(text):
+        months.append((5, int(mm.group(1))))
     if months:
         explicit_year = next((y for _, y in reversed(months) if y), None)
         resolved = []
@@ -276,11 +360,20 @@ _URGENT = re.compile(r"\b(urgent\w*|immediately|asap|right away|at the earliest|
 _POSITIVE = re.compile(r"\b(thank\w*|appreciat\w*|great|excellent|happy|pleased|wonderful|helpful|love)\b", re.I)
 
 
+_NEGATIVE_DEV = re.compile(
+    r"नाराज|त्रास|वैतागल|तक्रार|अस्वीकार्य|प्रतिसाद नाही|उत्तर नाही|जवाब नहीं|शिकायत|परेशान|फसवणूक|धोखाधड़ी|"
+    r"धोखाधडी|अनधिकृत|खराब सेवा|वाईट सेवा|तिसऱ्यांदा|तीसरी बार|दुसऱ्यांदा|तीन वेळा")
+_ESCALATE_DEV = re.compile(r"लोकपाल|वकील|कायदेशीर|कानूनी|मॅनेजर|मैनेजर|व्यवस्थापक|फसवणूक|धोखाधड़ी|धोखाधडी|अनधिकृत|"
+                           r"सोशल मीडिया|खाते बंद")
+_URGENT_DEV = re.compile(r"तात्काळ|ताबडतोब|तातडी|लगेच|तुरंत|अर्जेंट|अर्जंट|जल्द से जल्द|आजच|आज ही")
+_POSITIVE_DEV = re.compile(r"धन्यवाद|आभार|शुक्रिया|बहुत अच्छा|उत्तम|छान")
+
+
 def analyse_sentiment(text: str) -> dict:
-    neg = [m.group(0) for m in _NEGATIVE.finditer(text)]
-    esc = [m.group(0) for m in _ESCALATE.finditer(text)]
-    urg = [m.group(0) for m in _URGENT.finditer(text)]
-    pos = [m.group(0) for m in _POSITIVE.finditer(text)]
+    neg = [m.group(0) for m in _NEGATIVE.finditer(text)] + [m.group(0) for m in _NEGATIVE_DEV.finditer(text)]
+    esc = [m.group(0) for m in _ESCALATE.finditer(text)] + [m.group(0) for m in _ESCALATE_DEV.finditer(text)]
+    urg = [m.group(0) for m in _URGENT.finditer(text)] + [m.group(0) for m in _URGENT_DEV.finditer(text)]
+    pos = [m.group(0) for m in _POSITIVE.finditer(text)] + [m.group(0) for m in _POSITIVE_DEV.finditer(text)]
     exclaim = text.count("!") >= 2 or bool(re.search(r"\b[A-Z]{4,}\b(?:\s+\b[A-Z]{3,}\b)+", text))
 
     score = 0.25 * len(pos) - 0.4 * len(neg) - 0.3 * len(esc) - (0.2 if exclaim else 0)

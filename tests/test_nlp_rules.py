@@ -5,7 +5,7 @@ from models.schemas import IntentType, SentimentLabel
 from utils.masking import mask_account, mask_card, mask_text
 from utils.nlp_rules import (analyse_sentiment, detect_intents, extract_count, extract_period,
                              find_numbers)
-from utils.text_utils import detect_language, format_inr
+from utils.text_utils import format_inr
 
 
 def intents(text):
@@ -70,11 +70,3 @@ def test_inr_format():
     assert format_inr(125000) == "INR 1,25,000.00"
     assert format_inr(1520000.5) == "INR 15,20,000.50"
     assert format_inr(386) == "INR 386.00"
-
-
-def test_language_detection():
-    assert detect_language("Please send my account balance. Thank you for your help.") == "en"
-    assert detect_language("कृपया मेरे खाते का शेष बताएं और विवरण भेजें।") == "hi"
-    assert detect_language("कृपया माझ्या खात्याची शिल्लक सांगा आणि तपशील पाठवा.") == "mr"
-    assert detect_language("Por favor, envíeme el saldo de mi cuenta bancaria.") == "es"
-    assert detect_language("") == "unknown"

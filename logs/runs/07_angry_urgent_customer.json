@@ -1,9 +1,38 @@
 {
-  "run_id": "07c0c731ada343f197ab25176d39d974",
+  "run_id": "fdd7280b11114f2e9b0c056ed1a924ba",
   "email_id": "07_angry_urgent_customer",
+  "channel": "email",
   "sender": "john.doe@example.com",
+  "escalate_to_human": true,
+  "overall_confidence": 0.97,
+  "confidence": {
+    "overall": 0.97,
+    "requests": [
+      {
+        "id": "R1",
+        "intent": "CARD_TRANSACTIONS",
+        "status": "SUCCESS",
+        "intent_confidence": 0.95,
+        "entity_confidence": 1.0,
+        "execution_confidence": 1.0,
+        "confidence": 0.97
+      }
+    ],
+    "penalties": [],
+    "threshold": 0.65,
+    "ocr_confidence": null
+  },
+  "review": {
+    "hold": true,
+    "kind": "APPROVAL",
+    "reasons": [
+      "ESCALATION: no response, unacceptable, unauthorized charge, escalate to banking ombudsman"
+    ],
+    "status": "PENDING",
+    "review_id": 1
+  },
   "subject": "URGENT - third time asking!!",
-  "duration_ms": 40609,
+  "duration_ms": 20586,
   "llm_agents": [
     "email_understanding_agent",
     "entity_extraction_agent",
@@ -20,7 +49,7 @@
       "no response",
       "unacceptable",
       "unauthorized charge",
-      "escalate to the banking ombudsman"
+      "escalate to banking ombudsman"
     ],
     "method": "llm"
   },
@@ -88,13 +117,14 @@
         "email": "john.doe@example.com"
       },
       "ok": true,
-      "duration_ms": 30,
+      "duration_ms": 51,
       "response": {
         "status": "FOUND",
         "customer_id": "CUST001",
         "name": "John Doe",
         "email": "john.doe@example.com",
-        "primary_account": "XXXX7890"
+        "primary_account": "XXXX7890",
+        "phone": "+XXXX0001"
       },
       "error": null
     },
@@ -105,7 +135,7 @@
         "card_number": "XXXX8901"
       },
       "ok": true,
-      "duration_ms": 18,
+      "duration_ms": 15,
       "response": {
         "status": "VALID",
         "customer_name": "John Doe",
@@ -123,7 +153,7 @@
         "count": 3
       },
       "ok": true,
-      "duration_ms": 15,
+      "duration_ms": 13,
       "response": {
         "card_last4": "8901",
         "card_type": "Credit",
@@ -162,7 +192,7 @@
   "response": {
     "to": "john.doe@example.com",
     "subject": "Re: URGENT - third time asking!!",
-    "body": "Dear John Doe,\n\nI am so sorry to hear that you're experiencing an issue with your credit card. I understand the urgency and concern you have regarding the recent transactions, and I'm here to help you investigate this matter further.\n\nCredit Card Transactions - Card XXXX XXXX XXXX 8901 (VISA Credit), last 3:\n  1. 28-Oct-2026  Amazon India                       INR 4,599.00 Dr\n  2. 26-Oct-2026  Swiggy                               INR 642.50 Dr\n  3. 24-Oct-2026  Indian Oil Petrol Pump             INR 3,000.00 Dr\n  \u2022 Available credit limit: INR 1,51,240.00\n\nWe have flagged your email as a priority. A senior customer relationship officer will contact you within 24 hours.\n\nFor your security, we will never ask for your PIN, OTP or password over email.\n\nThank you,\nCustomer Support Team\nDemo Bank Ltd.",
+    "body": "Dear John Doe,\n\nI'm so sorry to hear that you're experiencing an issue with an unauthorized charge on your credit card. I'm here to help you resolve this matter as quickly as possible.\n\nCredit Card Transactions - Card XXXX XXXX XXXX 8901 (VISA Credit), last 3:\n  1. 28-Oct-2026  Amazon India                       INR 4,599.00 Dr\n  2. 26-Oct-2026  Swiggy                               INR 642.50 Dr\n  3. 24-Oct-2026  Indian Oil Petrol Pump             INR 3,000.00 Dr\n  \u2022 Available credit limit: INR 1,51,240.00\n\nWe have flagged your email as a priority. A senior customer relationship officer will contact you within 24 hours.\n\nFor your security, we will never ask for your PIN, OTP or password over email.\n\nThank you,\nCustomer Support Team\nDemo Bank Ltd.",
     "attachments": [],
     "in_reply_to": "<XXXX4702.21543.XXXX6557@example.com>"
   },
@@ -173,10 +203,10 @@
       "detail": {
         "subject": "URGENT - third time asking!!",
         "language": "en",
-        "summary": "Customer requests immediate access to their credit card's last 3 transactions due to suspected unauthorized charge.",
+        "summary": "The customer is requesting the last 3 transactions on their credit card be provided immediately due to an unauthorized charge concern.",
         "attachments": []
       },
-      "at": "2026-11-05T22:42:59"
+      "at": "2026-11-16T12:40:00"
     },
     {
       "agent": "intent_classification_agent",
@@ -194,7 +224,7 @@
           }
         ]
       },
-      "at": "2026-11-05T22:43:12"
+      "at": "2026-11-16T12:40:05"
     },
     {
       "agent": "sentiment_analysis_agent",
@@ -208,11 +238,11 @@
           "no response",
           "unacceptable",
           "unauthorized charge",
-          "escalate to the banking ombudsman"
+          "escalate to banking ombudsman"
         ],
         "method": "llm"
       },
-      "at": "2026-11-05T22:43:15"
+      "at": "2026-11-16T12:40:09"
     },
     {
       "agent": "entity_extraction_agent",
@@ -235,7 +265,7 @@
           }
         ]
       },
-      "at": "2026-11-05T22:43:23"
+      "at": "2026-11-16T12:40:13"
     },
     {
       "agent": "validation_agent",
@@ -254,7 +284,7 @@
           }
         ]
       },
-      "at": "2026-11-05T22:43:23"
+      "at": "2026-11-16T12:40:13"
     },
     {
       "agent": "api_selection_agent",
@@ -271,7 +301,7 @@
           }
         ]
       },
-      "at": "2026-11-05T22:43:23"
+      "at": "2026-11-16T12:40:13"
     },
     {
       "agent": "api_executor",
@@ -282,36 +312,62 @@
             "step": "S1",
             "tool": "get_card_transactions",
             "ok": true,
-            "ms": 15,
+            "ms": 13,
             "error": null
           }
         ]
       },
-      "at": "2026-11-05T22:43:23"
+      "at": "2026-11-16T12:40:13"
     },
     {
       "agent": "response_generation_agent",
       "event": "RESPONSE_DRAFTED",
       "detail": {
         "opening_by_llm": true,
+        "policy_answer_by_llm": false,
         "sections": 2,
         "attachments": [],
+        "language": "en",
+        "channel": "email",
+        "policy_sources": [],
         "outcome": "FULL_SUCCESS"
       },
-      "at": "2026-11-05T22:43:34"
+      "at": "2026-11-16T12:40:15"
     },
     {
-      "agent": "email_sender",
-      "event": "RESPONSE_DELIVERED",
+      "agent": "confidence_scoring_agent",
+      "event": "CONFIDENCE_SCORED",
       "detail": {
-        "to": "john.doe@example.com",
-        "mode": "file",
-        "files": {
-          "eml": "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/outbox/07_angry_urgent_customer_response.eml",
-          "txt": "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/outbox/07_angry_urgent_customer_response.txt"
-        }
+        "overall": 0.97,
+        "requests": [
+          {
+            "id": "R1",
+            "intent": "CARD_TRANSACTIONS",
+            "status": "SUCCESS",
+            "intent_confidence": 0.95,
+            "entity_confidence": 1.0,
+            "execution_confidence": 1.0,
+            "confidence": 0.97
+          }
+        ],
+        "penalties": [],
+        "threshold": 0.65,
+        "ocr_confidence": null
       },
-      "at": "2026-11-05T22:43:34"
+      "at": "2026-11-16T12:40:15"
+    },
+    {
+      "agent": "human_review_gate",
+      "event": "REVIEW_DECISION",
+      "detail": {
+        "decision": "HELD_FOR_APPROVAL",
+        "reasons": [
+          "ESCALATION: no response, unacceptable, unauthorized charge, escalate to banking ombudsman"
+        ],
+        "review_id": 1,
+        "overall_confidence": 0.97
+      },
+      "at": "2026-11-16T12:40:15"
     }
   ]
 }

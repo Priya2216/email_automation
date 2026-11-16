@@ -73,6 +73,9 @@ class EntityExtractionAgent:
 
         for req in all_requests:
             kind = _KIND_FOR_INTENT.get(req.intent)
+            if req.intent == IntentType.POLICY_QUERY:  # an information question: no entities, goes to RAG
+                result.append(req)
+                continue
             if kind is None:  # UNSUPPORTED - nothing to extract
                 req.status = RequestStatus.UNSUPPORTED
                 result.append(req)

@@ -43,7 +43,11 @@ class ValidationAgent:
         calls: list[ToolCallRecord] = []
 
         # 1. who is the sender?
-        lookup = await self._call("V0", "get_customer_by_email", {"email": email.sender})
+        # email channel -> look up by address; chat / SMS / WhatsApp / voice -> by mobile number
+        if "@" in email.sender:
+            lookup = await self._call("V0", "get_customer_by_email", {"email": email.sender})
+        else:
+            lookup = await self._call("V0", "get_customer_by_phone", {"phone": email.sender})
         calls.append(lookup)
         profile = dict(state.get("customer_profile") or {})
         if lookup.ok and lookup.response.get("status") == "FOUND":

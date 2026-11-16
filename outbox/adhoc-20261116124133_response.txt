@@ -1,0 +1,17 @@
+To: john.doe@example.com
+Subject: Re: Customer enquiry
+Attachments: -
+
+Dear John Doe,
+
+Thank you for reaching out to us about your credit card. We're happy to help you understand our late payment charges and provide more information to assist you.
+
+Policy Information:
+  The late payment charges on your credit card are INR 500 when the total amount due is up to INR 5,000, INR 750 when it is between INR 5,001 and INR 25,000, and INR 1,000 when it is above INR 25,000.
+  Source: Credit Card Fees and Charges - Late payment charges
+
+For your security, we will never ask for your PIN, OTP or password over email.
+
+Thank you,
+Customer Support Team
+Demo Bank Ltd.

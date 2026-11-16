@@ -110,5 +110,26 @@ async def get_customer_by_email(email: str) -> dict:
     return await _post("GetCustomerByEmailAPI", {"email": email})
 
 
+@mcp.tool()
+async def get_customer_by_phone(phone: str) -> dict:
+    """Look up the customer profile registered with a mobile number (chat / SMS / WhatsApp / voice channels)."""
+    return await _post("GetCustomerByPhoneAPI", {"phone": phone})
+
+
+@mcp.tool()
+async def search_policy(query: str, top_k: int = 3) -> dict:
+    """RAG policy lookup - the most relevant passages of the bank's policy knowledge base for a question
+    (fees, charges, card blocking, disputes, KYC, complaints, ...). Returns an empty list when nothing is relevant."""
+    import asyncio
+
+    from utils import rag
+
+    try:
+        return {"ok": True, "data": await asyncio.to_thread(rag.search_policy, query, top_k)}
+    except Exception as exc:  # noqa: BLE001 - tools must never crash the server
+        log.exception("search_policy failed")
+        return {"ok": False, "error": {"code": "POLICY_SEARCH_FAILED", "message": str(exc), "retryable": False}}
+
+
 if __name__ == "__main__":
     mcp.run("stdio")

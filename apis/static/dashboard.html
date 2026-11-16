@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Email Automation - Live Dashboard</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#667085; --line:#e3e6ec; --accent:#2f6fed;
+          --ok:#1a9b5b; --warn:#d98a00; --bad:#d23b3b; --bar:#cfe0ff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#11141a; --card:#1a1f29; --text:#e7eaf0; --muted:#98a2b3; --line:#2b3240; --accent:#6c9bff;
+            --ok:#3ecf8e; --warn:#f0b429; --bad:#ff6b6b; --bar:#27406f; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); }
+  header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding:14px 20px; border-bottom:1px solid var(--line); background:var(--card); }
+  header h1 { font-size:17px; margin:0; flex:1; }
+  .pill { font-size:12px; padding:3px 9px; border-radius:99px; border:1px solid var(--line); color:var(--muted); }
+  .live { color:var(--ok); border-color:var(--ok); }
+  main { padding:18px 20px; display:grid; gap:16px; max-width:1300px; margin:auto; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+  .kpi .v { font-size:26px; font-weight:650; } .kpi .l { color:var(--muted); font-size:12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+  h2 { font-size:13px; margin:0 0 10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .bar { display:flex; align-items:center; gap:8px; margin:5px 0; font-size:13px; }
+  .bar .n { width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bar .t { flex:1; background:var(--line); border-radius:4px; height:10px; overflow:hidden; }
+  .bar .t i { display:block; height:100%; background:var(--accent); }
+  .bar .c { width:34px; text-align:right; color:var(--muted); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:600; font-size:12px; }
+  .tablewrap { overflow-x:auto; }
+  .tag { font-size:11px; padding:1px 7px; border-radius:99px; background:var(--bar); }
+  .ok { color:var(--ok); } .warn { color:var(--warn); } .bad { color:var(--bad); }
+  button { font:inherit; cursor:pointer; border:1px solid var(--line); background:var(--card); color:var(--text); padding:4px 10px; border-radius:7px; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button.danger { color:var(--bad); border-color:var(--bad); }
+  input, textarea { font:inherit; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:7px; padding:5px 8px; }
+  dialog { width:min(720px,94vw); border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--text); }
+  dialog::backdrop { background:rgba(0,0,0,.45); }
+  textarea { width:100%; min-height:210px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; }
+  .msg { white-space:pre-wrap; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px 10px; max-height:130px; overflow:auto; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+  svg text { fill:var(--muted); font-size:10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Banking Email Automation - live dashboard</h1>
+  <span class="pill" id="llm">llm</span>
+  <span class="pill" id="updated">-</span>
+  <span class="pill live" id="live">LIVE</span>
+  <input id="reviewer" placeholder="your name" size="12" title="reviewer name for the audit trail">
+  <input id="key" placeholder="reviewer key (if set)" size="14" type="password">
+  <button id="pause">Pause</button>
+</header>
+<main>
+  <section class="kpis" id="kpis"></section>
+
+  <section class="grid">
+    <div class="card"><h2>Processed per minute (last 30 min)</h2><div id="spark"></div></div>
+    <div class="card"><h2>Outcomes</h2><div id="outcomes"></div></div>
+    <div class="card"><h2>Intents</h2><div id="intents"></div></div>
+    <div class="card"><h2>Channels</h2><div id="channels"></div></div>
+    <div class="card"><h2>Languages</h2><div id="languages"></div></div>
+    <div class="card"><h2>Sentiment</h2><div id="sentiments"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>Human review queue (held replies and hand-offs)</h2>
+    <div class="tablewrap"><table id="queue"></table></div>
+  </section>
+
+  <section class="grid">
+    <div class="card"><h2>Core banking / MCP tool health</h2><div class="tablewrap"><table id="tools"></table></div></div>
+    <div class="card"><h2>Request statuses</h2><div id="statuses"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>Recent runs</h2>
+    <div class="tablewrap"><table id="recent"></table></div>
+  </section>
+</main>
+
+<dialog id="dlg">
+  <h2 id="dtitle"></h2>
+  <div id="dmeta" style="font-size:12px;color:var(--muted)"></div>
+  <p style="margin:10px 0 4px"><b>Customer message</b></p><div class="msg" id="dcust"></div>
+  <p style="margin:10px 0 4px"><b>Why it needs a person</b></p><div class="msg" id="dwhy"></div>
+  <p style="margin:10px 0 4px"><b>Draft reply</b> (edit before approving if needed)</p>
+  <textarea id="dbody"></textarea>
+  <input id="dnote" placeholder="note for the audit trail" style="width:100%;margin-top:8px">
+  <div class="row">
+    <button class="primary" id="bapprove">Approve &amp; send</button>
+    <button class="danger" id="breject">Reject</button>
+    <button id="bresolve">Mark hand-off resolved</button>
+    <button id="bclose" style="margin-left:auto">Close</button>
+  </div>
+  <div id="derr" class="bad"></div>
+</dialog>
+
+<script>
+const $ = id => document.getElementById(id);
+let paused = false, current = null, original = "";
+const el = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
+const headers = () => { const h = {"Content-Type":"application/json"}; const k = $("key").value; if (k) h["X-Reviewer-Key"] = k; return h; };
+
+function bars(target, obj) {
+  const box = $(target); box.replaceChildren();
+  const entries = Object.entries(obj || {}); const max = Math.max(1, ...entries.map(e => e[1]));
+  if (!entries.length) box.append(el("div", "no data yet", "pill"));
+  for (const [k, v] of entries) {
+    const row = el("div", undefined, "bar"), t = el("div", undefined, "t"), i = el("i");
+    i.style.width = (100 * v / max) + "%"; t.append(i);
+    row.append(el("span", k, "n"), t, el("span", v, "c")); box.append(row);
+  }
+}
+function table(target, head, rows) {
+  const t = $(target); t.replaceChildren();
+  const hr = el("tr"); head.forEach(h => hr.append(el("th", h))); t.append(hr);
+  if (!rows.length) { const r = el("tr"), td = el("td", "nothing here", "pill"); td.colSpan = head.length; r.append(td); t.append(r); }
+  rows.forEach(cells => { const r = el("tr"); cells.forEach(c => { const td = el("td"); (c instanceof Node) ? td.append(c) : td.textContent = c; r.append(td); }); t.append(r); });
+}
+function spark(series) {
+  const w = 360, h = 70, max = Math.max(1, ...series.map(s => s.runs)), bw = w / series.length;
+  const ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${w} ${h + 14}`); svg.setAttribute("width", "100%");
+  series.forEach((s, i) => { const r = document.createElementNS(ns, "rect"); const bh = Math.max(1, h * s.runs / max);
+    r.setAttribute("x", i * bw + 1); r.setAttribute("y", h - bh); r.setAttribute("width", bw - 2); r.setAttribute("height", bh);
+    r.setAttribute("rx", 2); r.setAttribute("fill", "var(--accent)"); r.setAttribute("opacity", s.runs ? 1 : .25); svg.append(r); });
+  [0, 14, 29].forEach(i => { const t = document.createElementNS(ns, "text"); t.setAttribute("x", i * bw); t.setAttribute("y", h + 11); t.textContent = series[i].minute; svg.append(t); });
+  $("spark").replaceChildren(svg);
+}
+const cls = v => v === "FULL_SUCCESS" || v === "SUCCESS" ? "ok" : v === "PARTIAL_SUCCESS" ? "warn" : "bad";
+
+function render(m, pending, open) {
+  const q = m.review_queue, T = m.totals;
+  const kpis = [["Processed (window)", T.runs_in_window], ["Avg confidence", m.avg_confidence], ["p95 latency", m.latency_ms.p95 + " ms"],
+    ["Escalations", T.escalations], ["Awaiting approval", q.pending_approval], ["Open hand-offs", q.open_handoffs], ["Used LLM", T.llm_used]];
+  $("kpis").replaceChildren(...kpis.map(([l, v]) => { const c = el("div", undefined, "card kpi"); c.append(el("div", v, "v"), el("div", l, "l")); return c; }));
+  spark(m.series); bars("outcomes", m.outcomes); bars("intents", m.intents); bars("channels", m.channels);
+  bars("languages", m.languages); bars("sentiments", m.sentiments); bars("statuses", m.request_statuses);
+  table("tools", ["Tool", "Calls", "Failures", "Avg ms"], m.tools.map(t => [t.tool, t.calls, el("span", t.failures, t.failures ? "bad" : "ok"), t.avg_ms]));
+  table("recent", ["Time", "Message", "Channel", "Lang", "Intents", "Outcome", "Sentiment", "Conf.", "Review", "ms"],
+    m.recent_runs.map(r => [r.at, r.email_id, r.channel, r.language, r.intents.join(", "), el("span", r.outcome, cls(r.outcome)),
+      r.sentiment + (r.escalated ? " !" : ""), r.confidence, r.review, r.ms]));
+  const items = [...pending, ...open].sort((a, b) => b.id - a.id);
+  table("queue", ["#", "Type", "Customer / subject", "Why", "Conf.", "Waiting since", ""],
+    items.map(r => { const b = el("button", r.kind === "APPROVAL" ? "Review" : "Open", "primary"); b.onclick = () => openReview(r.id);
+      return ["#" + r.id, el("span", r.kind === "APPROVAL" ? "HELD" : "HAND-OFF", "tag"), r.sender + " - " + r.subject,
+              r.reasons.join("; "), r.overall_confidence, r.created_at.replace("T", " "), b]; }));
+}
+
+async function load() {
+  if (paused) return;
+  try {
+    const [m, p, o, h] = await Promise.all(["/v1/metrics", "/v1/review-queue?status=PENDING", "/v1/review-queue?status=OPEN", "/health"]
+      .map(u => fetch(u, {headers: headers()}).then(r => r.ok ? r.json() : Promise.reject(r.status + " " + u))));
+    render(m, p, o); $("llm").textContent = "LLM: " + h.llm + " | RAG: " + h.rag.method; $("updated").textContent = "updated " + new Date().toLocaleTimeString();
+    $("live").textContent = "LIVE"; $("live").className = "pill live";
+  } catch (e) { $("live").textContent = "OFFLINE (" + e + ")"; $("live").className = "pill bad"; }
+}
+
+async function openReview(id) {
+  const r = await fetch("/v1/review-queue/" + id, {headers: headers()}).then(x => x.json());
+  current = r; original = r.draft.body;
+  $("dtitle").textContent = `#${r.id} ${r.kind === "APPROVAL" ? "Held reply" : "Hand-off"} - ${r.sender}`;
+  $("dmeta").textContent = `${r.channel} | ${r.language} | confidence ${r.overall_confidence} | ${r.escalate ? "ESCALATED" : "not escalated"}`;
+  $("dcust").textContent = r.customer_message; $("dwhy").textContent = r.reasons.join("\n"); $("dbody").value = r.draft.body;
+  $("dnote").value = ""; $("derr").textContent = "";
+  const approval = r.kind === "APPROVAL";
+  $("bapprove").hidden = $("breject").hidden = !approval; $("bresolve").hidden = approval; $("dbody").readOnly = !approval;
+  $("dlg").showModal();
+}
+async function decide(action) {
+  const body = {reviewer: $("reviewer").value || "dashboard-user", note: $("dnote").value};
+  if (action === "approve" && $("dbody").value !== original) body.edited_body = $("dbody").value;
+  const res = await fetch(`/v1/review-queue/${current.id}/${action}`, {method:"POST", headers: headers(), body: JSON.stringify(body)});
+  if (!res.ok) { $("derr").textContent = (await res.json()).detail || res.status; return; }
+  $("dlg").close(); load();
+}
+$("bapprove").onclick = () => decide("approve"); $("breject").onclick = () => decide("reject");
+$("bresolve").onclick = () => decide("resolve"); $("bclose").onclick = () => $("dlg").close();
+$("pause").onclick = () => { paused = !paused; $("pause").textContent = paused ? "Resume" : "Pause"; $("live").textContent = paused ? "PAUSED" : "LIVE"; };
+$("key").value = sessionStorage.getItem("rk") || ""; $("key").onchange = () => sessionStorage.setItem("rk", $("key").value);
+load(); setInterval(load, 3000);
+</script>
+</body>
+</html>

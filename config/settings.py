@@ -24,7 +24,6 @@ class Settings(BaseSettings):
     # ollama -> always use Ollama (falls back to rules per call if it errors)
     # rules  -> never call an LLM (deterministic, fastest, used by tests)
     llm_provider: str = "auto"
-    
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3"
     llm_timeout_seconds: float = 60.0
@@ -63,6 +62,32 @@ class Settings(BaseSettings):
     max_parallel_emails: int = 4
     default_transaction_count: int = 5
     max_transaction_count: int = 20
+
+    # --- Confidence scoring + human-in-the-loop approval -------------------------
+    # A reply is HELD for a human (not sent) when the overall confidence is below the
+    # threshold or the customer must be escalated. A reviewer then approves/rejects it.
+    confidence_threshold: float = 0.65
+    human_review_enabled: bool = True
+    review_on_escalation: bool = True
+    review_on_low_confidence: bool = True
+    reviewer_api_key: str = ""  # when set, review endpoints need header X-Reviewer-Key
+
+    # --- RAG: banking policy lookup ---------------------------------------------
+    kb_dir: Path = PROJECT_ROOT / "knowledge"
+    rag_top_k: int = 3
+    rag_min_score: float = 0.30       # normalised relevance (0..1) below which no answer is given
+    rag_embedding_model: str = ""     # e.g. nomic-embed-text / bge-m3 (Ollama); empty -> BM25
+
+    # --- OCR / attachments --------------------------------------------------------
+    ocr_languages: str = "eng+hin+mar"  # only the installed Tesseract language packs are used
+    ocr_min_confidence: float = 60.0    # below this mean word confidence the reply goes to review
+    ocr_max_pdf_pages: int = 5
+
+    # --- Voice channel (speech-to-text is optional: pip install faster-whisper) -----
+    whisper_model: str = "base"
+
+    # --- Reply language: auto = reply in the customer's language (en / hi / mr) ------
+    reply_language: str = "auto"
 
     # --- Audit / logging --------------------------------------------------------
     database_url: str = f"sqlite:///{PROJECT_ROOT / 'logs' / 'audit.db'}"
