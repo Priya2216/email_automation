@@ -1,0 +1,251 @@
+{
+  "info": {
+    "_postman_id": "74c695d0-361e-4131-9dbe-c09ddfc3bafc",
+    "name": "hdfc_project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "23006879",
+    "_collection_link": "https://go.postman.co/collection/23006879-74c695d0-361e-4131-9dbe-c09ddfc3bafc?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8000/health",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"channel\": \"whatsapp\",\n  \"sender\": \"+919820000001\",\n  \"text\": \"कृपया माझ्या खात्याची शिल्लक सांगा\",\n  \"body\": \"कृपया माझ्या खात्याची शिल्लक सांगा\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/v1/process-email",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "v1",
+            "process-email"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ValidateAccountAPI",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"account_number\":\"1234567890\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8001/api/v1/ValidateAccountAPI",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8001",
+          "path": [
+            "api",
+            "v1",
+            "ValidateAccountAPI"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "test_pdf",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": [
+                "/Users/priyaraut/Desktop/study/nikhil/intelligent-email-automation-mcp/sample_emails/inbox/marathi_request.eml"
+              ]
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/v1/process-email",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "v1",
+            "process-email"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "test_multi Copy",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const r = pm.response.json().response;\nconst html = `\n  <div style=\"font-family:Arial;padding:12px\">\n    <div><b>To:</b> {{to}}</div>\n    <div><b>Subject:</b> {{subject}}</div>\n    <hr>\n    <pre style=\"white-space:pre-wrap;font-family:Arial\">{{body}}</pre>\n  </div>`;\npm.visualizer.set(html, r);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sender\": \"john.doe@example.com\",\n  \"subject\": \"Balance and card transactions\",\n  \"body\": \"Please share my account balance for account 1234567890 and also send last 3 transactions of my credit card 987654321.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/v1/process-email",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "v1",
+            "process-email"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "human_escalate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const r = pm.response.json().response;\nconst html = `\n  <div style=\"font-family:Arial;padding:12px\">\n    <div><b>To:</b> {{to}}</div>\n    <div><b>Subject:</b> {{subject}}</div>\n    <hr>\n    <pre style=\"white-space:pre-wrap;font-family:Arial\">{{body}}</pre>\n  </div>`;\npm.visualizer.set(html, r);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sender\": \"john.doe@example.com\",\n  \"subject\": \"URGENT\",\n  \"body\": \"This is the THIRD time I am writing and still no response!! This is unacceptable. I need the last 3 transactions on my credit card 4567123456788901 IMMEDIATELY, I think there is an unauthorized charge. If this is not resolved today I will escalate to the banking ombudsman.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/v1/process-email",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "v1",
+            "process-email"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sender\": \"john.doe@example.com\",\n  \"subject\": \"Balance and card transactions\",\n  \"body\": \"Please share my account balance for account 1234567890 and also send last 3 transactions of my credit card 987654321.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/v1/process-email",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "v1",
+            "process-email"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

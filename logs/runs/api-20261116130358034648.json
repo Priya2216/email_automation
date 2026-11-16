@@ -1,0 +1,329 @@
+{
+  "run_id": "d10b826f30e84aa6ac9986e0d6164dea",
+  "email_id": "api-XXXX4648",
+  "channel": "email",
+  "sender": "+XXXX0001",
+  "escalate_to_human": false,
+  "overall_confidence": 0.88,
+  "confidence": {
+    "overall": 0.88,
+    "requests": [
+      {
+        "id": "R1",
+        "intent": "BALANCE_ENQUIRY",
+        "status": "SUCCESS",
+        "intent_confidence": 0.95,
+        "entity_confidence": 0.85,
+        "execution_confidence": 1.0,
+        "confidence": 0.93
+      }
+    ],
+    "penalties": [
+      "language=mr (-0.05)"
+    ],
+    "threshold": 0.65,
+    "ocr_confidence": null
+  },
+  "review": {
+    "hold": false,
+    "kind": null,
+    "reasons": [],
+    "status": "NOT_REQUIRED",
+    "review_id": null
+  },
+  "subject": "Customer enquiry",
+  "duration_ms": 17527,
+  "llm_agents": [
+    "email_understanding_agent",
+    "entity_extraction_agent",
+    "intent_classification_agent",
+    "response_generation_agent",
+    "sentiment_analysis_agent"
+  ],
+  "sentiment": {
+    "label": "NEUTRAL",
+    "score": 0.0,
+    "is_urgent": false,
+    "escalate_to_human": false,
+    "reasons": [
+      "request for account balance"
+    ],
+    "method": "llm"
+  },
+  "requests": [
+    {
+      "request_id": "R1",
+      "intent": "BALANCE_ENQUIRY",
+      "text_span": "\u092e\u093e\u091d\u094d\u092f\u093e \u0916\u093e\u0924\u094d\u092f\u093e\u091a\u0940 \u0936\u093f\u0932\u094d\u0932\u0915",
+      "confidence": 0.95,
+      "method": "llm",
+      "account_number": "XXXX7890",
+      "card_number": null,
+      "period_start": null,
+      "period_end": null,
+      "period_label": null,
+      "transaction_count": null,
+      "entity_sources": {
+        "account_number": "profile"
+      },
+      "status": "SUCCESS",
+      "validation_notes": [
+        "Account taken from the customer's registered profile",
+        "Account validated"
+      ],
+      "result": {
+        "account_number": "XXXX7890",
+        "account_type": "Savings",
+        "currency": "INR",
+        "available_balance": 125000.0,
+        "ledger_balance": 127450.0,
+        "as_of": "2026-11-16T13:04:13"
+      },
+      "error": null
+    }
+  ],
+  "tool_calls": [
+    {
+      "step_id": "V0",
+      "tool": "get_customer_by_phone",
+      "arguments": {
+        "phone": "+XXXX0001"
+      },
+      "ok": true,
+      "duration_ms": 71,
+      "response": {
+        "status": "FOUND",
+        "customer_id": "CUST001",
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "primary_account": "XXXX7890",
+        "phone": "+XXXX0001"
+      },
+      "error": null
+    },
+    {
+      "step_id": "VA1",
+      "tool": "validate_account",
+      "arguments": {
+        "account_number": "XXXX7890"
+      },
+      "ok": true,
+      "duration_ms": 15,
+      "response": {
+        "status": "VALID",
+        "customer_name": "John Doe",
+        "customer_id": "CUST001",
+        "account_type": "Savings"
+      },
+      "error": null
+    },
+    {
+      "step_id": "S1",
+      "tool": "get_account_balance",
+      "arguments": {
+        "account_number": "XXXX7890"
+      },
+      "ok": true,
+      "duration_ms": 14,
+      "response": {
+        "account_number": "XXXX7890",
+        "account_type": "Savings",
+        "currency": "INR",
+        "available_balance": 125000.0,
+        "ledger_balance": 127450.0,
+        "as_of": "2026-11-16T13:04:13"
+      },
+      "error": null
+    }
+  ],
+  "response": {
+    "to": "+XXXX0001",
+    "subject": "Re: Customer enquiry",
+    "body": "\u092a\u094d\u0930\u093f\u092f John Doe,\n\n\u0924\u0941\u092e\u091a\u094d\u092f\u093e \u0916\u093e\u0924\u094d\u092f\u093e\u0924\u0940\u0932 \u0938\u094d\u0925\u093f\u0924\u0940 \u092e\u093e\u0939\u093f\u0924\u0940 \u092e\u093e\u0917\u0923\u094d\u092f\u093e\u0924 \u0906\u0932\u0940 \u0906\u0939\u0947.\n\n\u0916\u093e\u0924\u094d\u092f\u093e\u0924\u0940\u0932 \u0936\u093f\u0932\u094d\u0932\u0915:\n  \u2022 \u0916\u093e\u0924\u0947 \u0915\u094d\u0930\u092e\u093e\u0902\u0915: XXXX7890 (\u0924\u0941\u092e\u091a\u0947 \u0928\u094b\u0902\u0926\u0923\u0940\u0915\u0943\u0924 \u092a\u094d\u0930\u093e\u0925\u092e\u093f\u0915 \u0916\u093e\u0924\u0947)\n  \u2022 \u0916\u093e\u0924\u094d\u092f\u093e\u091a\u093e \u092a\u094d\u0930\u0915\u093e\u0930: Savings\n  \u2022 \u0909\u092a\u0932\u092c\u094d\u0927 \u0936\u093f\u0932\u094d\u0932\u0915: INR 1,25,000.00\n  \u2022 \u0932\u0947\u091c\u0930 \u0936\u093f\u0932\u094d\u0932\u0915: INR 1,27,450.00\n  \u2022 \u0926\u093f\u0928\u093e\u0902\u0915/\u0935\u0947\u0933: 16-Nov-2026 13:04\n\n\u0924\u0941\u092e\u091a\u094d\u092f\u093e \u0938\u0941\u0930\u0915\u094d\u0937\u093f\u0924\u0924\u0947\u0938\u093e\u0920\u0940: \u0906\u092e\u094d\u0939\u0940 \u0908\u092e\u0947\u0932\u0935\u0930 \u0924\u0941\u092e\u091a\u093e PIN, OTP \u0915\u093f\u0902\u0935\u093e \u092a\u093e\u0938\u0935\u0930\u094d\u0921 \u0915\u0927\u0940\u0939\u0940 \u092e\u093e\u0917\u0924 \u0928\u093e\u0939\u0940.\n\n\u0927\u0928\u094d\u092f\u0935\u093e\u0926,\n\u0917\u094d\u0930\u093e\u0939\u0915 \u0938\u0947\u0935\u093e \u091f\u0940\u092e\n\u0921\u0947\u092e\u094b \u092c\u0901\u0915 \u0932\u093f\u092e\u093f\u091f\u0947\u0921",
+    "attachments": [],
+    "in_reply_to": ""
+  },
+  "trace": [
+    {
+      "agent": "email_understanding_agent",
+      "event": "EMAIL_UNDERSTOOD",
+      "detail": {
+        "subject": "Customer enquiry",
+        "language": "mr",
+        "summary": "Please provide the balance of my account.",
+        "attachments": []
+      },
+      "at": "2026-11-16T13:04:02"
+    },
+    {
+      "agent": "intent_classification_agent",
+      "event": "INTENTS_DETECTED",
+      "detail": {
+        "method": "llm",
+        "source": "body",
+        "multi_intent": false,
+        "intents": [
+          {
+            "id": "R1",
+            "intent": "BALANCE_ENQUIRY",
+            "confidence": 0.95,
+            "span": "\u092e\u093e\u091d\u094d\u092f\u093e \u0916\u093e\u0924\u094d\u092f\u093e\u091a\u0940 \u0936\u093f\u0932\u094d\u0932\u0915"
+          }
+        ]
+      },
+      "at": "2026-11-16T13:04:06"
+    },
+    {
+      "agent": "sentiment_analysis_agent",
+      "event": "SENTIMENT_DETECTED",
+      "detail": {
+        "label": "NEUTRAL",
+        "score": 0.0,
+        "is_urgent": false,
+        "escalate_to_human": false,
+        "reasons": [
+          "request for account balance"
+        ],
+        "method": "llm"
+      },
+      "at": "2026-11-16T13:04:09"
+    },
+    {
+      "agent": "entity_extraction_agent",
+      "event": "ENTITIES_EXTRACTED",
+      "detail": {
+        "method": "llm+rules",
+        "customer_name_in_email": "\u092e\u093e\u091d\u094d\u092f\u093e",
+        "requests": [
+          {
+            "id": "R1",
+            "intent": "BALANCE_ENQUIRY",
+            "account": null,
+            "card": null,
+            "period": null,
+            "count": null,
+            "sources": {}
+          }
+        ]
+      },
+      "at": "2026-11-16T13:04:13"
+    },
+    {
+      "agent": "validation_agent",
+      "event": "VALIDATION_DONE",
+      "detail": {
+        "sender_known": true,
+        "customer_id": "CUST001",
+        "parallel_validation_calls": 1,
+        "results": [
+          {
+            "id": "R1",
+            "status": "PENDING",
+            "notes": [
+              "Account taken from the customer's registered profile",
+              "Account validated"
+            ]
+          }
+        ]
+      },
+      "at": "2026-11-16T13:04:13"
+    },
+    {
+      "agent": "api_selection_agent",
+      "event": "EXECUTION_PLAN",
+      "detail": {
+        "distinct_calls": 1,
+        "parallel_waves": 1,
+        "decisions": [
+          {
+            "id": "R1",
+            "decision": "call",
+            "tool": "get_account_balance",
+            "step": "S1"
+          }
+        ]
+      },
+      "at": "2026-11-16T13:04:13"
+    },
+    {
+      "agent": "api_executor",
+      "event": "APIS_EXECUTED",
+      "detail": {
+        "calls": [
+          {
+            "step": "S1",
+            "tool": "get_account_balance",
+            "ok": true,
+            "ms": 14,
+            "error": null
+          }
+        ]
+      },
+      "at": "2026-11-16T13:04:13"
+    },
+    {
+      "agent": "response_generation_agent",
+      "event": "RESPONSE_DRAFTED",
+      "detail": {
+        "opening_by_llm": true,
+        "policy_answer_by_llm": false,
+        "sections": 1,
+        "attachments": [],
+        "language": "mr",
+        "channel": "email",
+        "policy_sources": [],
+        "outcome": "FULL_SUCCESS"
+      },
+      "at": "2026-11-16T13:04:15"
+    },
+    {
+      "agent": "confidence_scoring_agent",
+      "event": "CONFIDENCE_SCORED",
+      "detail": {
+        "overall": 0.88,
+        "requests": [
+          {
+            "id": "R1",
+            "intent": "BALANCE_ENQUIRY",
+            "status": "SUCCESS",
+            "intent_confidence": 0.95,
+            "entity_confidence": 0.85,
+            "execution_confidence": 1.0,
+            "confidence": 0.93
+          }
+        ],
+        "penalties": [
+          "language=mr (-0.05)"
+        ],
+        "threshold": 0.65,
+        "ocr_confidence": null
+      },
+      "at": "2026-11-16T13:04:15"
+    },
+    {
+      "agent": "human_review_gate",
+      "event": "REVIEW_DECISION",
+      "detail": {
+        "decision": "AUTO_SEND",
+        "reasons": [],
+        "review_id": null,
+        "overall_confidence": 0.88
+      },
+      "at": "2026-11-16T13:04:15"
+    },
+    {
+      "agent": "email_sender",
+      "event": "RESPONSE_DELIVERED",
+      "detail": {
+        "to": "+XXXX0001",
+        "channel": "email",
+        "mode": "file",
+        "files": {
+          "eml": "/Users/priyaraut/Desktop/study/email_automation/outbox/api-20261116130358034648_response.eml",
+          "txt": "/Users/priyaraut/Desktop/study/email_automation/outbox/api-20261116130358034648_response.txt"
+        }
+      },
+      "at": "2026-11-16T13:04:15"
+    }
+  ]
+}
